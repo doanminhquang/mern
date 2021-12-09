@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const verifyToken = require("../middleware/auth");
+const mongoose = require("mongoose");
 
 const Post = require("../models/Post");
 const User = require("../models/User");
@@ -12,9 +13,68 @@ const Student = require("../models/Students");
 // @access Public
 router.get("/", async (req, res) => {
   try {
-    const posts = await Post.find({})
+    /*const posts = await Post.find({})
       .sort({ createdAt: -1 })
-      .populate("user", ["name", "username", "avatar"]);
+      .populate("user", ["name", "username", "avatar"]);*/
+    const posts = await Post.aggregate([
+      { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "info",
+        },
+      },
+      { $addFields: { user: { $arrayElemAt: ["$info", 0] } } },
+      { $unset: "info" },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "cmt",
+        },
+      },
+      {
+        $addFields: {
+          sumrating: { $sum: "$cmt.rating" },
+        },
+      },
+      {
+        $addFields: {
+          countrating: { $size: "$cmt" },
+        },
+      },
+
+      {
+        $addFields: {
+          avgrating: {
+            $round: [
+              {
+                $cond: [
+                  { $eq: ["$countrating", 0] },
+                  0,
+                  { $divide: ["$sumrating", "$countrating"] },
+                ],
+              },
+              2,
+            ],
+          },
+        },
+      },
+      { $unset: "sumrating" },
+      { $unset: "cmt" },
+      {
+        $project: {
+          "user.password": false,
+          "user.email": false,
+          "user.createdAt": false,
+          "user.__v": false,
+          "user.type": false,
+        },
+      },
+    ]);
     res.json({ success: true, posts });
   } catch (error) {
     console.log(error);
@@ -22,21 +82,384 @@ router.get("/", async (req, res) => {
   }
 });
 
-// @route GET api/posts
+// @route GET api/posts/myposts/:id
+// @desc Get posts
+// @access Private
+router.get("/myposts/:id", verifyToken, async (req, res) => {
+  try {
+    /*const posts = await Post.find({ user: req.params.id })
+      .sort({ createdAt: -1 })
+      .populate("user", ["name", "username", "avatar"]);*/
+    var id = mongoose.Types.ObjectId(req.params.id);
+    const posts = await Post.aggregate([
+      {
+        $match: { user: id },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "info",
+        },
+      },
+      { $addFields: { user: { $arrayElemAt: ["$info", 0] } } },
+      { $unset: "info" },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "cmt",
+        },
+      },
+      {
+        $addFields: {
+          sumrating: { $sum: "$cmt.rating" },
+        },
+      },
+      {
+        $addFields: {
+          countrating: { $size: "$cmt" },
+        },
+      },
+
+      {
+        $addFields: {
+          avgrating: {
+            $round: [
+              {
+                $cond: [
+                  { $eq: ["$countrating", 0] },
+                  0,
+                  { $divide: ["$sumrating", "$countrating"] },
+                ],
+              },
+              2,
+            ],
+          },
+        },
+      },
+      { $unset: "sumrating" },
+      { $unset: "cmt" },
+      {
+        $project: {
+          "user.password": false,
+          "user.email": false,
+          "user.createdAt": false,
+          "user.__v": false,
+          "user.type": false,
+        },
+      },
+    ]);
+    res.json({ success: true, posts });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" });
+  }
+});
+
+// @route GET api/posts/myposts/:id
+// @desc Get posts
+// @access Private
+router.get("/myenrolls/:id", verifyToken, async (req, res) => {
+  try {
+    /*const posts = await Student.find({ user: req.params.id })
+      .populate("post")
+      .populate("user", ["name", "username", "avatar"])
+      .sort({ createdAt: -1 });*/
+    var id = mongoose.Types.ObjectId(req.params.id);
+    const posts = await Student.aggregate([
+      {
+        $match: { user: id },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "post",
+          foreignField: "_id",
+          as: "listpost",
+        },
+      },
+      { $addFields: { post: { $arrayElemAt: ["$listpost", 0] } } },
+      { $unset: "listpost" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "info",
+        },
+      },
+      { $addFields: { user: { $arrayElemAt: ["$info", 0] } } },
+      { $unset: "info" },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "cmt",
+        },
+      },
+      {
+        $addFields: {
+          sumrating: { $sum: "$cmt.rating" },
+        },
+      },
+      {
+        $addFields: {
+          countrating: { $size: "$cmt" },
+        },
+      },
+
+      {
+        $addFields: {
+          avgrating: {
+            $round: [
+              {
+                $cond: [
+                  { $eq: ["$countrating", 0] },
+                  0,
+                  { $divide: ["$sumrating", "$countrating"] },
+                ],
+              },
+              2,
+            ],
+          },
+        },
+      },
+      { $unset: "sumrating" },
+      { $unset: "cmt" },
+      {
+        $project: {
+          "user.password": false,
+          "user.email": false,
+          "user.createdAt": false,
+          "user.__v": false,
+          "user.type": false,
+        },
+      },
+    ]);
+    res.json({ success: true, posts });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" });
+  }
+});
+
+// @route GET api/posts/:id
 // @desc Get post by id
 // @access Public
 router.get("/:id", async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id).populate("user", [
+    /* const post = await Post.findById(req.params.id).populate("user", [
       "name",
       "username",
       "avatar",
-    ]);
-    const more = await Post.find({})
+    ]);*/
+    /*const more = await Post.find({})
       .sort({ createdAt: -1 })
       .limit(4)
-      .populate("user", ["name", "username", "avatar"]);
+      .populate("user", ["name", "username", "avatar"]);*/
+    var id = mongoose.Types.ObjectId(req.params.id);
+    const posts = await Post.aggregate([
+      {
+        $match: { _id: id },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "info",
+        },
+      },
+      { $addFields: { user: { $arrayElemAt: ["$info", 0] } } },
+      { $unset: "info" },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "cmt",
+        },
+      },
+      {
+        $addFields: {
+          sumrating: { $sum: "$cmt.rating" },
+        },
+      },
+      {
+        $addFields: {
+          countrating: { $size: "$cmt" },
+        },
+      },
+
+      {
+        $addFields: {
+          avgrating: {
+            $round: [
+              {
+                $cond: [
+                  { $eq: ["$countrating", 0] },
+                  0,
+                  { $divide: ["$sumrating", "$countrating"] },
+                ],
+              },
+              2,
+            ],
+          },
+        },
+      },
+      { $unset: "sumrating" },
+      { $unset: "cmt" },
+      {
+        $project: {
+          "user.password": false,
+          "user.email": false,
+          "user.createdAt": false,
+          "user.__v": false,
+          "user.type": false,
+        },
+      },
+    ]);
+    const more = await Post.aggregate([
+      { $sort: { createdAt: -1 } },
+      { $limit: 4 },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "info",
+        },
+      },
+      { $addFields: { user: { $arrayElemAt: ["$info", 0] } } },
+      { $unset: "info" },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "cmt",
+        },
+      },
+      {
+        $addFields: {
+          sumrating: { $sum: "$cmt.rating" },
+        },
+      },
+      {
+        $addFields: {
+          countrating: { $size: "$cmt" },
+        },
+      },
+
+      {
+        $addFields: {
+          avgrating: {
+            $round: [
+              {
+                $cond: [
+                  { $eq: ["$countrating", 0] },
+                  0,
+                  { $divide: ["$sumrating", "$countrating"] },
+                ],
+              },
+              2,
+            ],
+          },
+        },
+      },
+      { $unset: "sumrating" },
+      { $unset: "cmt" },
+      {
+        $project: {
+          "user.password": false,
+          "user.email": false,
+          "user.createdAt": false,
+          "user.__v": false,
+          "user.type": false,
+        },
+      },
+    ]);
+    const post = posts[0];
     res.json({ success: true, post, more });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" });
+  }
+});
+
+// @route GET api/posts/hot/
+// @desc Get post hot
+// @access Public
+router.get("/hot/:id", async (req, res) => {
+  try {
+    const posts_hot = await Student.aggregate([
+      { $group: { _id: "$post", students: { $sum: 1 } } },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "_id",
+          as: "info",
+        },
+      },
+      { $addFields: { name: { $arrayElemAt: ["$info.title", 0] } } },
+      { $unset: "info" },
+      {
+        $lookup: {
+          from: "post_details",
+          localField: "_id",
+          foreignField: "post",
+          as: "List_video",
+        },
+      },
+      { $addFields: { videos: { $size: "$List_video" } } },
+      { $unset: "List_video" },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "cmt",
+        },
+      },
+      {
+        $addFields: {
+          sumrating: { $sum: "$cmt.rating" },
+        },
+      },
+      {
+        $addFields: {
+          countrating: { $size: "$cmt" },
+        },
+      },
+      {
+        $addFields: {
+          avgrating: {
+            $round: [
+              {
+                $cond: [
+                  { $eq: ["$countrating", 0] },
+                  0,
+                  { $divide: ["$sumrating", "$countrating"] },
+                ],
+              },
+              2,
+            ],
+          },
+        },
+      },
+      { $unset: "sumrating" },
+      { $unset: "cmt" },
+      { $sort: { avgrating: -1, countrating: -1, students: -1 } },
+      { $limit: parseInt(req.params.id) },
+    ]);
+    res.json({ success: true, posts_hot });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" });

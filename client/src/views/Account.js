@@ -122,7 +122,7 @@ const Account = () => {
       headStyles: {
         textColor: "white",
         fontStyle: "bold",
-        background: "#1261a0",
+        background: "#603ce4",
       },
       bodyStyles: {
         textColor: "black",
@@ -229,7 +229,7 @@ const Account = () => {
         field: "action",
         sort: "asc",
         attributes: {
-          width: "8%",
+          width: "10%",
         },
       },
     ],
@@ -245,7 +245,7 @@ const Account = () => {
   if (usersLoading) {
     body = (
       <div className="spinner-container">
-        <Spinner animation="border" variant="info" />
+        <Spinner animation="border" style={{ color: "#603ce4" }} />
       </div>
     );
   } else if (users && users.length === 0) {
@@ -262,7 +262,7 @@ const Account = () => {
                 title="Làm mới dữ liệu"
                 style={{
                   marginLeft: "10px",
-                  background: "#1261A0",
+                  background: "#603ce4",
                   border: "none",
                 }}
                 onClick={() => {
@@ -290,9 +290,10 @@ const Account = () => {
           <div id="left">
             <Button
               style={{
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
                 marginLeft: "10px",
+                padding: 10,
               }}
               onClick={hanlderClickCSV}
             >
@@ -306,8 +307,9 @@ const Account = () => {
             <Button
               style={{
                 marginLeft: "10px",
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
+                padding: 10,
               }}
               onClick={(e) => {
                 downloadxls(e, createdata());
@@ -318,8 +320,9 @@ const Account = () => {
             <Button
               style={{
                 marginLeft: "10px",
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
+                padding: 10,
               }}
               onClick={() => {
                 exportPDF();
@@ -332,8 +335,9 @@ const Account = () => {
               title="Làm mới dữ liệu"
               style={{
                 marginLeft: "10px",
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
+                padding: 10,
               }}
               onClick={() => {
                 FuncRefresh();
@@ -345,9 +349,10 @@ const Account = () => {
           <div id="right">
             <Button
               style={{
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
                 marginRight: "10px",
+                padding: 10,
               }}
               onClick={setShowAddUserModal.bind(this, true)}
             >
@@ -360,7 +365,9 @@ const Account = () => {
           style={{
             overflow: "scroll",
             maxHeight: "calc(100vh - 116px)",
-            padding: 0,
+            background: "white",
+            padding: 10,
+            borderRadius: 15,
           }}
         >
           {data ? (
@@ -380,7 +387,13 @@ const Account = () => {
   }
 
   return (
-    <>
+    <div
+      style={{
+        padding: " 2.75rem 2.25rem",
+        width: "100%",
+        position: "relative",
+      }}
+    >
       {body}
       <Register />
       {user !== null && showUpdateUserModal && <UpdateUserModal />}
@@ -401,7 +414,7 @@ const Account = () => {
           <strong>{message}</strong>
         </Toast.Body>
       </Toast>
-    </>
+    </div>
   );
 };
 

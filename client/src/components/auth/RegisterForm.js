@@ -1,5 +1,3 @@
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 import { Link } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
@@ -50,76 +48,105 @@ const RegisterForm = () => {
 
   return (
     <>
-      <Form className="my-4" onSubmit={register} autoComplete="new-password">
-        <AlertMessage info={alert} />
-        <Form.Group>
-          <Form.Control
-            type="text"
-            placeholder="Nhập họ tên"
-            name="name"
-            required
-            value={name}
-            onChange={onChangeRegisterForm}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Control
-            type="text"
-            placeholder="Tài khoản"
-            name="username"
-            required
-            value={username}
-            onChange={onChangeRegisterForm}
-            autoComplete="new-password"
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Control
-            type="text"
-            placeholder="Email"
-            name="email"
-            required
-            value={email}
-            onChange={onChangeRegisterForm}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Control
-            type="password"
-            placeholder="Mật khẩu"
-            name="password"
-            required
-            value={password}
-            onChange={onChangeRegisterForm}
-            autoComplete="new-password"
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Control
-            type="password"
-            placeholder="Nhập lại mật khẩu"
-            name="confirmPassword"
-            required
-            value={confirmPassword}
-            onChange={onChangeRegisterForm}
-          />
-        </Form.Group>
-        <Button variant="success" type="submit">
-          Đăng kí
-        </Button>
-      </Form>
-      <p>
-        Bạn đã có tài khoản?
-        <Link to="/login">
-          <Button
-            size="sm"
-            className="ml-2"
-            style={{ background: "#f9e467", color: "black", border: "none" }}
+      <div className="auth-form-light text-left p-5">
+        <form className="pt-3" onSubmit={register}>
+          <div className="form-group">
+            <input
+              style={{
+                fontSize: "0.95rem",
+              }}
+              type="text"
+              className="form-control form-control-lg"
+              placeholder="Tên"
+              name="name"
+              required
+              value={name}
+              onChange={onChangeRegisterForm}
+            />
+          </div>
+          <div className="form-group">
+            <input
+              style={{
+                fontSize: "0.95rem",
+              }}
+              type="text"
+              className="form-control form-control-lg"
+              placeholder="Tài Khoản"
+              name="username"
+              required
+              value={username}
+              onChange={onChangeRegisterForm}
+            />
+          </div>
+          <div className="form-group">
+            <input
+              style={{
+                fontSize: "0.95rem",
+              }}
+              type="text"
+              className="form-control form-control-lg"
+              placeholder="Địa Chỉ email"
+              name="email"
+              required
+              value={email}
+              onChange={onChangeRegisterForm}
+            />
+          </div>
+          <div className="form-group">
+            <input
+              style={{
+                fontSize: "0.95rem",
+              }}
+              type="password"
+              className="form-control form-control-lg"
+              placeholder="Mật Khẩu"
+              name="password"
+              required
+              value={password}
+              onChange={onChangeRegisterForm}
+            />
+          </div>
+          <div className="form-group">
+            <input
+              style={{
+                fontSize: "0.95rem",
+              }}
+              type="password"
+              className="form-control form-control-lg"
+              placeholder="Nhập lại Mật Khẩu"
+              name="confirmPassword"
+              required
+              value={confirmPassword}
+              onChange={onChangeRegisterForm}
+            />
+          </div>
+          <div className="mt-3">
+            <button
+              className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
+              type="submit"
+              style={{
+                fontFamily: "-webkit-body",
+                fontWidth: "bold",
+                fontWeight: "bold",
+                fontSize: "1rem",
+                backgroundColor: "#603ce4",
+              }}
+            >
+              Đăng ký
+            </button>
+          </div>
+          <div
+            className="text-center mt-4 font-weight-light"
+            style={{ fontFamily: "-webkit-body", fontWidth: "bold" }}
           >
-            Đăng nhập
-          </Button>
-        </Link>
-      </p>
+            Bạn đã có tài khoản?{" "}
+            <Link to="/login" style={{ color: "#603ce4" }}>
+              Đăng nhập ngay
+            </Link>
+          </div>
+        </form>
+      </div>
+      <AlertMessage info={alert} />
     </>
   );
 };

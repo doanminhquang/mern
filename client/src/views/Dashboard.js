@@ -3,7 +3,18 @@ import React, { useEffect, useCallback, useState } from "react";
 import Button from "react-bootstrap/Button";
 //-----------------------------------------------
 import { HiRefresh } from "react-icons/hi";
-import { PieChart, Pie, Sector } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Sector,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 //-----------------------------------------------
 import { apiUrl } from "../contexts/constants";
 import axios from "axios";
@@ -27,6 +38,8 @@ const Dashboard = () => {
       cpuFree: "",
     },
   });
+
+  const [PostsHot, setPostHot] = useState([]);
 
   // db
   const [activeIndexDB, setActiveIndexDB] = useState(0);
@@ -76,12 +89,26 @@ const Dashboard = () => {
     }
   };
 
-  //get info db and sv
+  const limit = 5;
+
+  const getPostsHot = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/posts/hot/${limit}`);
+      if (response.data.success) {
+        setPostHot(response.data.posts_hot);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //get info db and sv and hot posts
   useEffect(() => {
     let componentMounted = true;
     const fetchData = async () => {
       if (componentMounted) {
         getinfo();
+        getPostsHot();
       }
     };
     fetchData();
@@ -354,10 +381,17 @@ const Dashboard = () => {
 
   const FuncRefresh = () => {
     getinfo();
+    getPostsHot();
   };
 
   return (
-    <>
+    <div
+      style={{
+        padding: " 2.75rem 2.25rem",
+        width: "100%",
+        position: "relative",
+      }}
+    >
       <div
         style={{
           marginTop: "10px",
@@ -370,8 +404,9 @@ const Dashboard = () => {
           title="Làm mới dữ liệu"
           style={{
             marginLeft: "10px",
-            background: "#1261A0",
+            background: "#603ce4",
             border: "none",
+            padding: 10,
           }}
           onClick={() => {
             FuncRefresh();
@@ -386,13 +421,60 @@ const Dashboard = () => {
           width: "fit-content",
           padding: "10px",
           minHeight: "50vh",
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
         }}
       >
         <div
           style={{
             display: "inline-block",
-            width: "450px",
-            height: "420px",
+            width: "470px",
+            padding: 10,
+            margin: 10,
+            background: "white",
+            borderRadius: 15,
+            paddingTop: 50,
+          }}
+        >
+          <BarChart
+            width={450}
+            height={400}
+            data={PostsHot}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="students" fill="#8884d8" name="Số lượng học viên" />
+            <Bar dataKey="videos" fill="#82ca9d" name="Số lượng video" />
+            <Bar
+              dataKey="avgrating"
+              fill="#4d94ff"
+              name="Trung bình đánh giá"
+            />
+          </BarChart>
+          <p>
+            <center>
+              <b>Danh sách top {limit} khóa học nổi bật</b>
+            </center>
+          </p>
+        </div>
+        <div
+          style={{
+            display: "inline-block",
+            width: "470px",
+            padding: 10,
+            margin: 10,
+            background: "white",
+            borderRadius: 15,
           }}
         >
           <PieChart width={450} height={400}>
@@ -412,7 +494,7 @@ const Dashboard = () => {
           <p>
             <center>
               <b>
-                Dữ liệu thống kê bộ nhớ (Trung bình:{" "}
+                Dữ liệu thống kê bộ nhớ csdl (Trung bình:{" "}
                 {dbinfo.avgObjSize
                   ? formatBytes(dbinfo.avgObjSize) + "/ bản ghi"
                   : 0}
@@ -436,8 +518,11 @@ const Dashboard = () => {
         <div
           style={{
             display: "inline-block",
-            width: "450px",
-            height: "420px",
+            width: "470px",
+            padding: 10,
+            margin: 10,
+            background: "white",
+            borderRadius: 15,
           }}
         >
           <PieChart width={450} height={400}>
@@ -486,8 +571,11 @@ const Dashboard = () => {
         <div
           style={{
             display: "inline-block",
-            width: "450px",
-            height: "420px",
+            width: "470px",
+            padding: 10,
+            margin: 10,
+            background: "white",
+            borderRadius: 15,
           }}
         >
           <PieChart width={450} height={400}>
@@ -527,7 +615,7 @@ const Dashboard = () => {
           </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

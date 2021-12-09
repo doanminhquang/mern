@@ -16,10 +16,9 @@ const createsreach = (id) => {
   return "?id=" + id;
 };
 
-const ItemCourse = ({
-  post: { _id, title, coursetype, thumbnail, countrating, avgrating },
+const ItemMyCourse = ({
+  post: { _id, title, coursetype, thumbnail, avgrating, countrating },
   user,
-  Posts,
 }) => {
   return (
     <>
@@ -29,7 +28,6 @@ const ItemCourse = ({
             to={{
               pathname: "/coursedetail/",
               search: createsreach(_id),
-              state: Posts,
             }}
             style={{ color: "black" }}
           >
@@ -78,4 +76,4 @@ const ItemCourse = ({
   );
 };
 
-export default ItemCourse;
+export default ItemMyCourse;

@@ -30,8 +30,16 @@ router.get("/", verifyToken, async (req, res) => {
       infodb.objects = stats.objects;
       infodb.avgObjSize = stats.avgObjSize;
       infodb.storageSize = stats.storageSize;
-      // 512mb of M0 mongodb alat (stats.totalFreeStorageSize not work auto return 0)
-      infodb.totalFreeStorageSize = 536870912 - stats.storageSize;
+      // 512mb chỉ số của M0 mongodb alas (stats.totalFreeStorageSize auto 0 nếu dùng alas)
+      /*infodb.totalFreeStorageSize =
+        stats.totalFreeStorageSize == 0
+          ? 536870912 - stats.storageSize
+          : stats.totalFreeStorageSize;*/
+      const size = stats.fsTotalSize - stats.fsUsedSize;
+      infodb.totalFreeStorageSize =
+        stats.totalFreeStorageSize == 0
+          ? 536870912 - stats.storageSize
+          : size - stats.totalFreeStorageSize;
     });
 
     infosv = new Object();

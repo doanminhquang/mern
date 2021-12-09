@@ -21,10 +21,26 @@ const UpdateVideoModal = () => {
 
   useEffect(() => setUpdatedVideo(video), [video]);
 
+  //get id ytb
+  const youtube_parser = (url) => {
+    var regExp =
+      /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    var match = url.match(regExp);
+    return match && match[7].length === 11 ? match[7] : url;
+  };
+
   const onChangeUpdatedVideoForm = (event) =>
     setUpdatedVideo({
       ...updatedVideo,
       [event.target.name]: event.target.value,
+    });
+
+  const onChangeUpdatedVideoFormForVideo = (event) =>
+    setUpdatedVideo({
+      ...updatedVideo,
+      video:
+        "https://www.youtube-nocookie.com/embed/" +
+        youtube_parser(event.target.value),
     });
 
   const closeDialog = () => {
@@ -77,7 +93,7 @@ const UpdateVideoModal = () => {
                 required
                 aria-describedby="title-help"
                 value={updatedVideo.video}
-                onChange={onChangeUpdatedVideoForm}
+                onChange={onChangeUpdatedVideoFormForVideo}
               />
               <Form.Text id="title-help" muted>
                 Bắt buộc

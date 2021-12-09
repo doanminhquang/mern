@@ -36,7 +36,7 @@ export default function Preload() {
         <div id="bottom" className="mask">
           <div className="plane"></div>
         </div>
-        <p style={{ marginTop: 5 }}>ĐANG TẢI...</p>
+        <p style={{ marginTop: 15 }}>ĐANG TẢI...</p>
       </div>
     </div>
   );

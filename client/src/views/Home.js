@@ -17,6 +17,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { Link } from "react-router-dom";
 //-----------------------------------------------------------
 import { FaArrowRight } from "react-icons/fa";
+//-----------------------------------------------------------
 
 const Home = () => {
   // Contexts
@@ -67,7 +68,7 @@ const Home = () => {
   if (postsLoading) {
     body = (
       <div className="spinner-container">
-        <Spinner animation="border" variant="info" />
+        <Spinner animation="border" style={{ color: "#603ce4" }} />
       </div>
     );
   } else if (posts.length === 0) {
@@ -172,7 +173,13 @@ const Home = () => {
           <div className="row">
             <div className="col-lg-5 col-md-5">
               <div className="hero-content">
-                <h2>Học để thành công</h2>
+                <h2
+                  style={{
+                    fontFamily: "Montserrat",
+                  }}
+                >
+                  Học để thành công
+                </h2>
                 <p>
                   Lập trình là kỹ năng cần có trong thời đại 4.0 và dần trở
                   thành 1 kỹ năng cơ bản mà ai cũng cần có như đọc, viết hay

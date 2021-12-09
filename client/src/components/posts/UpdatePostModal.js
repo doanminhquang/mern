@@ -122,7 +122,7 @@ const UpdatePostModal = () => {
           <div style={{ marginTop: "5px" }}>
             <Button
               style={{
-                background: "#1261A0",
+                background: "#603ce4",
                 border: 0,
                 with: "100%",
               }}
@@ -153,7 +153,7 @@ const UpdatePostModal = () => {
             Hủy
           </Button>
           <Button
-            style={{ background: "#1261A0", border: "none" }}
+            style={{ background: "#603ce4", border: "none" }}
             type="submit"
           >
             Lưu

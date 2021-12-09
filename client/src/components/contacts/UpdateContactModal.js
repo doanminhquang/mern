@@ -122,7 +122,7 @@ const UpdateContactModal = () => {
             Hủy
           </Button>
           <Button
-            style={{ background: "#1261A0", border: "none" }}
+            style={{ background: "#603ce4", border: "none" }}
             type="submit"
           >
             Lưu

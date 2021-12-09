@@ -12,10 +12,12 @@ import { FaUser } from "react-icons/fa";
 import { FaBars } from "react-icons/fa";
 import { FaSignOutAlt } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
+import { CgProfile } from "react-icons/cg";
 //-----------------------------------------------------
 import { Link } from "react-router-dom";
 //-----------------------------------------------------
 import NavDropdown from "react-bootstrap/NavDropdown";
+//-----------------------------------------------------
 
 export default function Navbar() {
   const {
@@ -42,7 +44,8 @@ export default function Navbar() {
     if (
       path === "/courses" ||
       path === "/contact" ||
-      path === "/coursedetail/"
+      path === "/coursedetail/" ||
+      path === "/profile/"
     ) {
       SetLogoMode(false);
     }
@@ -53,13 +56,18 @@ export default function Navbar() {
     return str;
   };
 
+  const profilepath = `/profile/?id=${user ? user._id : "0"}`;
+
   return (
     <>
       <header className="header-01 sticky">
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
-              <nav className="navbar navbar-expand-lg">
+              <nav
+                className="navbar navbar-expand-lg"
+                style={{ background: "transparent" }}
+              >
                 <Link
                   className="navbar-brand"
                   to={{
@@ -134,11 +142,12 @@ export default function Navbar() {
                   <>
                     <NavDropdown
                       title={
-                        <Link
+                        <button
                           className="user-btn"
-                          style={{ overflow: "hidden", lineHeight: "inherit" }}
-                          to={{
-                            pathname: "",
+                          style={{
+                            overflow: "hidden",
+                            lineHeight: "inherit",
+                            padding: 0,
                           }}
                         >
                           <img
@@ -152,12 +161,22 @@ export default function Navbar() {
                               objectFit: "cover",
                             }}
                           />
-                        </Link>
+                        </button>
                       }
                       id="basic-nav-dropdown"
                       className="font-weight-bolder text-white"
                       style={{ color: "white" }}
                     >
+                      <NavDropdown.Item>
+                        <Link
+                          style={{ color: "black" }}
+                          to={{
+                            pathname: profilepath,
+                          }}
+                        >
+                          <CgProfile size="20" /> Trang cá nhân
+                        </Link>
+                      </NavDropdown.Item>
                       <NavDropdown.Item>
                         {user !== null && user.type === "admin" ? (
                           <Link

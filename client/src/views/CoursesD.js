@@ -3,6 +3,7 @@ import { useContext, useEffect } from "react";
 import { PostContext } from "../contexts/PostContext";
 import { VideoContext } from "../contexts/VideoContext";
 import { StudentContext } from "../contexts/StudentContext";
+import { CommentContext } from "../contexts/CommentContext";
 import { AuthContext } from "../contexts/AuthContext";
 //---------------------------------------------------
 import Spinner from "react-bootstrap/Spinner";
@@ -58,6 +59,11 @@ const CoursesD = () => {
     getStudents,
   } = useContext(StudentContext);
 
+  const {
+    commentState: { commentLoading },
+    getComments,
+  } = useContext(CommentContext);
+
   // Start: Get all posts
   useEffect(() => {
     let componentMounted = true;
@@ -92,6 +98,20 @@ const CoursesD = () => {
     const fetchData = async () => {
       if (componentMounted) {
         getStudents();
+      }
+    };
+    fetchData();
+    return () => {
+      componentMounted = false;
+    };
+  }, []);
+
+  // Start: Get all comments
+  useEffect(() => {
+    let componentMounted = true;
+    const fetchData = async () => {
+      if (componentMounted) {
+        getComments();
       }
     };
     fetchData();
@@ -143,6 +163,7 @@ const CoursesD = () => {
     getPosts();
     getAllVideo();
     getStudents();
+    getComments();
   };
 
   /// pdf
@@ -180,7 +201,7 @@ const CoursesD = () => {
       headStyles: {
         textColor: "white",
         fontStyle: "bold",
-        background: "#1261a0",
+        background: "#603ce4",
       },
       bodyStyles: {
         textColor: "black",
@@ -284,7 +305,7 @@ const CoursesD = () => {
         field: "description",
         sort: "asc",
         attributes: {
-          width: "35%",
+          width: "32%",
         },
       },
       {
@@ -300,7 +321,7 @@ const CoursesD = () => {
         field: "action",
         sort: "asc",
         attributes: {
-          width: "12%",
+          width: "15%",
         },
       },
     ],
@@ -309,10 +330,10 @@ const CoursesD = () => {
 
   let body = null;
 
-  if (postsLoading || videosLoading || studentsLoading) {
+  if (postsLoading || videosLoading || studentsLoading || commentLoading) {
     body = (
       <div className="spinner-container">
-        <Spinner animation="border" variant="info" />
+        <Spinner animation="border" style={{ color: "#603ce4" }} />
       </div>
     );
   } else if (posts && posts.length === 0) {
@@ -323,7 +344,7 @@ const CoursesD = () => {
           <Card.Body>
             <Card.Text>Click nút để thêm khóa học</Card.Text>
             <Button
-              style={{ background: "#1261A0", border: "none" }}
+              style={{ background: "#603ce4", border: "none" }}
               onClick={setShowAddPostModal.bind(this, true)}
             >
               Thêm ngay
@@ -332,7 +353,7 @@ const CoursesD = () => {
               title="Làm mới dữ liệu"
               style={{
                 marginLeft: "10px",
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
               }}
               onClick={() => {
@@ -359,9 +380,10 @@ const CoursesD = () => {
           <div id="left">
             <Button
               style={{
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
                 marginLeft: "10px",
+                padding: 10,
               }}
               onClick={hanlderClickCSV}
             >
@@ -375,8 +397,9 @@ const CoursesD = () => {
             <Button
               style={{
                 marginLeft: "10px",
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
+                padding: 10,
               }}
               onClick={(e) => {
                 downloadxls(e, createdata());
@@ -387,8 +410,9 @@ const CoursesD = () => {
             <Button
               style={{
                 marginLeft: "10px",
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
+                padding: 10,
               }}
               onClick={() => {
                 exportPDF();
@@ -400,8 +424,9 @@ const CoursesD = () => {
               title="Làm mới dữ liệu"
               style={{
                 marginLeft: "10px",
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
+                padding: 10,
               }}
               onClick={() => {
                 FuncRefresh();
@@ -413,9 +438,10 @@ const CoursesD = () => {
           <div id="right">
             <Button
               style={{
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
                 marginRight: "10px",
+                padding: 10,
               }}
               onClick={setShowAddPostModal.bind(this, true)}
             >
@@ -428,7 +454,9 @@ const CoursesD = () => {
           style={{
             overflow: "scroll",
             maxHeight: "calc(100vh - 116px)",
-            padding: 0,
+            background: "white",
+            padding: 10,
+            borderRadius: 15,
           }}
         >
           {data ? (
@@ -448,7 +476,13 @@ const CoursesD = () => {
   }
 
   return (
-    <>
+    <div
+      style={{
+        padding: " 2.75rem 2.25rem",
+        width: "100%",
+        position: "relative",
+      }}
+    >
       {body}
       <AddPostModal />
       {post !== null && showUpdatePostModal && <UpdatePostModal />}
@@ -470,7 +504,7 @@ const CoursesD = () => {
           <strong>{message}</strong>
         </Toast.Body>
       </Toast>
-    </>
+    </div>
   );
 };
 

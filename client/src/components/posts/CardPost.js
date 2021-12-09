@@ -5,6 +5,8 @@ import Card from "react-bootstrap/Card";
 import author from "../../assets/home/author.png";
 import { formatDate } from "../../utils/FormatDate";
 import { getTextDisplay } from "../../utils/GettextDisplay";
+import Star from "../layout/Star";
+//-----------------------------------------------------
 
 const removeHTML = (str) => {
   var tmp = document.createElement("DIV");
@@ -22,8 +24,17 @@ const createsreach = (id) => {
 };
 
 const CardPost = ({
-  post: { _id, title, description, coursetype, thumbnail, createdAt },
-  user: { id, username, name, avatar },
+  post: {
+    _id,
+    title,
+    description,
+    coursetype,
+    thumbnail,
+    createdAt,
+    countrating,
+    avgrating,
+  },
+  user,
   Posts,
 }) => {
   return (
@@ -52,14 +63,20 @@ const CardPost = ({
                     search: createsreach(_id),
                     state: Posts,
                   }}
+                  style={{ color: "white" }}
                 >
                   {title}
                 </Link>
               </h4>
+              <div className="ratings">
+                <Star rating={avgrating} />
+                <span style={{ paddingBottom: 6, paddingTop: 10 }}>
+                  {avgrating} ({countrating})
+                </span>
+              </div>
               <div className="author">
-                <img src={checkavatar(avatar)} alt={username} />
+                <img src={checkavatar(user.avatar)} alt={user.username} />
                 <p
-                  id={id}
                   style={{
                     display: "inline",
                     marginLeft: "5px",
@@ -67,7 +84,15 @@ const CardPost = ({
                     fontSize: "16px",
                   }}
                 >
-                  {name}
+                  <Link
+                    to={{
+                      pathname: "/profile/",
+                      search: createsreach(user._id),
+                    }}
+                    style={{ color: "white" }}
+                  >
+                    {user.name}
+                  </Link>
                 </p>
               </div>
               <Card.Text>
@@ -79,6 +104,7 @@ const CardPost = ({
                     WebkitBoxOrient: "vertical",
                     WebkitLineClamp: 4,
                     display: "-webkit-box",
+                    color: "white",
                   }}
                 >
                   {removeHTML(description)}

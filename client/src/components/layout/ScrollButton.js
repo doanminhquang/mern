@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { FaAngleDoubleUp } from "react-icons/fa";
+import { Button } from "react-bootstrap";
 
 const ScrollButton = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,16 +26,24 @@ const ScrollButton = () => {
   }, []);
 
   return isVisible ? (
-    <FaAngleDoubleUp
+    <Button
       onClick={scrollToTop}
-      id="back-to-top"
       style={{
+        position: "fixed",
         bottom: "20px",
+        right: "30px",
+        zIndex: 99,
         opacity: 1,
         border: 0,
-        visibility: "visibility!important",
+        width: "40px",
+        height: "40px",
+        padding: 0,
+        borderRadius: "50%",
+        backgroundColor: "#5838fc",
       }}
-    />
+    >
+      <FaAngleDoubleUp />
+    </Button>
   ) : (
     ""
   );

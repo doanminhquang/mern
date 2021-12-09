@@ -128,12 +128,11 @@ const AddPostModal = () => {
           <div style={{ marginTop: "5px" }}>
             <Button
               style={{
-                background: "#1261A0",
+                background: "#603ce4",
                 border: 0,
                 with: "100%",
               }}
               onClick={hanlderClickUpload}
-              title="Nhập tệp csv hoặc excel"
             >
               Vui lòng chọn ảnh <BiImageAdd />
               <input
@@ -160,7 +159,7 @@ const AddPostModal = () => {
           </Button>
           <Button
             id="btn_add"
-            style={{ background: "#1261A0", border: "none" }}
+            style={{ background: "#603ce4", border: "none" }}
             type="submit"
           >
             Thêm

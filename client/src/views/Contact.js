@@ -262,7 +262,7 @@ const ContactView = () => {
       headStyles: {
         textColor: "white",
         fontStyle: "bold",
-        background: "#1261a0",
+        background: "#603ce4",
       },
       bodyStyles: {
         textColor: "black",
@@ -328,7 +328,7 @@ const ContactView = () => {
         field: "name",
         sort: "asc",
         attributes: {
-          width: "7%",
+          width: "12%",
         },
       },
       {
@@ -344,7 +344,7 @@ const ContactView = () => {
         field: "subject",
         sort: "asc",
         attributes: {
-          width: "8%",
+          width: "5%",
         },
       },
       {
@@ -368,7 +368,7 @@ const ContactView = () => {
         field: "action",
         sort: "asc",
         attributes: {
-          width: "6%",
+          width: "8%",
         },
       },
     ],
@@ -380,7 +380,7 @@ const ContactView = () => {
   if (contactsLoading) {
     body = (
       <div className="spinner-container">
-        <Spinner animation="border" variant="info" />
+        <Spinner animation="border" style={{ color: "#603ce4" }} />
       </div>
     );
   } else if (contacts && contacts.length === 0) {
@@ -395,7 +395,7 @@ const ContactView = () => {
                 title="Làm mới dữ liệu"
                 style={{
                   marginLeft: "10px",
-                  background: "#1261A0",
+                  background: "#603ce4",
                   border: "none",
                 }}
                 onClick={() => {
@@ -419,7 +419,7 @@ const ContactView = () => {
                   />
                   <Button
                     style={{
-                      background: "#1261A0",
+                      background: "#603ce4",
                       border: 0,
                     }}
                     onClick={hanlderClickUpload}
@@ -441,7 +441,7 @@ const ContactView = () => {
                     disabled={LockSend}
                     title="Gửi"
                     style={{
-                      background: "#1261A0",
+                      background: "#603ce4",
                       border: 0,
                       marginLeft: "10px",
                     }}
@@ -465,7 +465,7 @@ const ContactView = () => {
                   />
                   <Button
                     style={{
-                      background: "#1261A0",
+                      background: "#603ce4",
                       border: 0,
                     }}
                     onClick={hanlderClickUpload}
@@ -487,7 +487,7 @@ const ContactView = () => {
                     disabled={LockSend}
                     title="Gửi"
                     style={{
-                      background: "#1261A0",
+                      background: "#603ce4",
                       border: 0,
                       marginLeft: "10px",
                     }}
@@ -516,9 +516,10 @@ const ContactView = () => {
             <Button
               title="Xuất tệp csv"
               style={{
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
                 marginLeft: "10px",
+                padding: 10,
               }}
               onClick={hanlderClickCSV}
             >
@@ -533,8 +534,9 @@ const ContactView = () => {
               title="Xuất tệp excel"
               style={{
                 marginLeft: "10px",
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
+                padding: 10,
               }}
               onClick={(e) => {
                 downloadxls(e, createdata());
@@ -546,8 +548,9 @@ const ContactView = () => {
               title="Xuất tệp pdf"
               style={{
                 marginLeft: "10px",
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
+                padding: 10,
               }}
               onClick={() => {
                 exportPDF();
@@ -559,8 +562,9 @@ const ContactView = () => {
               title="Làm mới dữ liệu"
               style={{
                 marginLeft: "10px",
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
+                padding: 10,
               }}
               onClick={() => {
                 FuncRefresh();
@@ -586,8 +590,9 @@ const ContactView = () => {
               />
               <Button
                 style={{
-                  background: "#1261A0",
+                  background: "#603ce4",
                   border: 0,
+                  padding: 10,
                 }}
                 onClick={hanlderClickUpload}
                 title="Nhập tệp CSV"
@@ -608,9 +613,10 @@ const ContactView = () => {
                 disabled={LockSend}
                 title="Gửi"
                 style={{
-                  background: "#1261A0",
+                  background: "#603ce4",
                   border: 0,
                   marginLeft: "10px",
+                  padding: 10,
                 }}
               >
                 <MdSend />
@@ -634,8 +640,9 @@ const ContactView = () => {
               />
               <Button
                 style={{
-                  background: "#1261A0",
+                  background: "#603ce4",
                   border: 0,
+                  padding: 10,
                 }}
                 onClick={hanlderClickUpload}
                 title="Nhập tệp Excel"
@@ -656,9 +663,10 @@ const ContactView = () => {
                 disabled={LockSend}
                 title="Gửi"
                 style={{
-                  background: "#1261A0",
+                  background: "#603ce4",
                   border: 0,
                   marginLeft: "10px",
+                  padding: 10,
                 }}
               >
                 <MdSend />
@@ -671,7 +679,9 @@ const ContactView = () => {
           style={{
             overflow: "scroll",
             maxHeight: "calc(100vh - 116px)",
-            padding: 0,
+            background: "white",
+            padding: 10,
+            borderRadius: 15,
           }}
         >
           {data ? (
@@ -691,7 +701,13 @@ const ContactView = () => {
   }
 
   return (
-    <>
+    <div
+      style={{
+        padding: " 2.75rem 2.25rem",
+        width: "100%",
+        position: "relative",
+      }}
+    >
       {body}
       {contact !== null && showUpdateContactModal && <UpdateContactModal />}
       {contact !== null && showContactModal && <ViewContactModal />}
@@ -712,7 +728,7 @@ const ContactView = () => {
           <strong>{message}</strong>
         </Toast.Body>
       </Toast>
-    </>
+    </div>
   );
 };
 

@@ -6,6 +6,7 @@ import Preload from "../components/layout/PreLoad";
 import CardPost from "../components/posts/CardPost";
 import { PostContext } from "../contexts/PostContext";
 import Spinner from "react-bootstrap/Spinner";
+//--------------------------------------------------------
 
 const Courses = () => {
   // Contexts
@@ -56,7 +57,7 @@ const Courses = () => {
   if (postsLoading) {
     body = (
       <div className="spinner-container">
-        <Spinner animation="border" variant="info" />
+        <Spinner animation="border" style={{ color: "#603ce4" }} />
       </div>
     );
   } else if (posts.length === 0) {

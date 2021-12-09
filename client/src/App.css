@@ -2,7 +2,6 @@ html,
 body {
   margin: 0;
   padding: 0;
-  /*overflow-x: hidden;*/
 }
 
 a:hover {
@@ -11,7 +10,8 @@ a:hover {
 
 .landing {
   position: relative;
-  background: url("./assets/login.jpg") no-repeat center center/cover;
+  /* background: url("./assets/login.png") no-repeat center center/cover;*/
+  background: #f1f1f1;
   height: 100vh;
 }
 
@@ -23,19 +23,6 @@ a:hover {
   justify-content: center;
   align-items: center;
   text-align: center;
-}
-
-.landing-inner form {
-  width: 30%;
-}
-
-.landing-inner form button[type="submit"] {
-  background-color: #3891e3;
-  border: none;
-}
-
-.landing-inner form button[type="submit"]:hover {
-  background-color: #1261a0;
 }
 
 .spinner-container {
@@ -52,6 +39,7 @@ a:hover {
   padding-top: 0;
   background: transparent !important;
   border: none !important;
+  padding: 10px !important;
 }
 
 .post-button:hover {

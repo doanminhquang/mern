@@ -1,5 +1,4 @@
 import React from "react";
-import "bootstrap/dist/css/bootstrap.css";
 
 export default function Footer() {
   return (
@@ -15,7 +14,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Đoàn Minh Quang
+                  Đoàn Minh Quang{" "}
                 </a>
                 © 2021
               </p>

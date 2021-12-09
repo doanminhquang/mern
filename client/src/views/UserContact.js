@@ -12,6 +12,8 @@ import { FaLinkedinIn } from "react-icons/fa";
 import { AuthContext } from "../contexts/AuthContext";
 import { ContactContext } from "../contexts/ContactContext";
 import Toast from "react-bootstrap/Toast";
+//---------------------------------------------------------
+import Banner from "../assets/banner.jpg";
 
 const UserContact = () => {
   // Contexts
@@ -48,7 +50,7 @@ const UserContact = () => {
     return () => {
       componentMounted = false;
     };
-  });
+  }, []);
 
   const { namecontact, email, subject, messagecontact } = contactForm;
 
@@ -88,7 +90,7 @@ const UserContact = () => {
       <div>
         <section
           className="page-banner"
-          style={{ backgroundImage: "url(assets/images/banner.jpg)" }}
+          style={{ backgroundImage: `url(${Banner})` }}
         >
           <div className="container">
             <div className="row">

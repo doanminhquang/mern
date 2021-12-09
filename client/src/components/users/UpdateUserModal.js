@@ -187,7 +187,7 @@ const UpdateUserModal = () => {
             </Form.Control>
           </Form.Group>
           <Button
-            style={{ background: "#1261A0", border: "none" }}
+            style={{ background: "#603ce4", border: "none" }}
             onClick={GenNewPass}
           >
             Cấp mới mật khẩu
@@ -195,7 +195,7 @@ const UpdateUserModal = () => {
           {GenPass ? (
             <Button
               style={{
-                background: "#1261A0",
+                background: "#603ce4",
                 border: "none",
                 float: "right",
                 marginRight: "4px",
@@ -213,7 +213,7 @@ const UpdateUserModal = () => {
             Hủy
           </Button>
           <Button
-            style={{ background: "#1261A0", border: "none" }}
+            style={{ background: "#603ce4", border: "none" }}
             type="submit"
           >
             Lưu

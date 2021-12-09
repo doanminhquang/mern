@@ -10,6 +10,7 @@ const userRouter = require("./routes/user");
 const videoRouter = require("./routes/video");
 const studentRouter = require("./routes/student");
 const infoServerRouter = require("./routes/infoserver");
+const comment = require("./routes/comment");
 
 if (process.env.ENV_VARIABLE == "production") {
   console.log = function () {};
@@ -17,15 +18,16 @@ if (process.env.ENV_VARIABLE == "production") {
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(
-      `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@qlms.wo0ki.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
-      {
-        useCreateIndex: true,
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: false,
-      }
-    );
+    const conn =
+      process.env.MODE != "LOCAL"
+        ? `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@qlms.wo0ki.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+        : "mongodb://localhost:27017/QLMS";
+    await mongoose.connect(conn, {
+      useCreateIndex: true,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+    });
 
     console.log("MongoDB đã kết nối");
   } catch (error) {
@@ -54,6 +56,7 @@ app.use("/api/users", userRouter);
 app.use("/api/videos", videoRouter);
 app.use("/api/students", studentRouter);
 app.use("/api/info", infoServerRouter);
+app.use("/api/comments", comment);
 
 const PORT = process.env.PORT || 5000;
 

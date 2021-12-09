@@ -24,6 +24,19 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
+// @route GET api/users/:id
+// @desc Get users
+// @access Private
+router.get("/:id", verifyToken, async (req, res) => {
+  try {
+    const users = await User.find({ _id: req.params.id }).select("-password");
+    res.json({ success: true, users });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" });
+  }
+});
+
 // @route POST api/users
 // @desc Register user
 // @access Private
@@ -98,7 +111,7 @@ router.put("/:id", verifyToken, async (req, res) => {
       name,
       username,
       email,
-      password: hashedPassword ? hashedPassword : password,
+      password: hashedPassword !== "" ? hashedPassword : password,
       type,
       avatar,
     };
@@ -110,6 +123,55 @@ router.put("/:id", verifyToken, async (req, res) => {
       updatedUser,
       { new: true }
     );
+
+    // Người dùng không được phép cập nhật tài khoản hoặc không tìm thấy tài khoản
+    if (!updatedUser)
+      return res.status(401).json({
+        success: false,
+        message: "Không tìm thấy tài khoản hoặc người dùng không được ủy quyền",
+      });
+
+    res.json({
+      success: true,
+      message: "Đã cập nhật!",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" });
+  }
+});
+
+// @route PUT api/users/myinfo
+// @desc Update user
+// @access Private
+router.put("/myinfo/:id", verifyToken, async (req, res) => {
+  const { nusername, nemail, npassword, nname, navatar, ntype } = req.body;
+  let stockpass = await User.findById(req.userId).select("password");
+
+  let hashedPassword = "";
+  if (npassword !== "") {
+    hashedPassword = await argon2.hash(npassword);
+  }
+  try {
+    let updatedUser = {
+      name: nname,
+      username: nusername,
+      email: nemail,
+      password: hashedPassword !== "" ? hashedPassword : stockpass.password,
+      type: ntype,
+      avatar: navatar,
+    };
+
+    if (req.params.id === req.userId) {
+      updatedUser = await User.findOneAndUpdate(
+        { _id: req.params.id },
+        updatedUser,
+        { new: true }
+      );
+    } else {
+      res.status(500).json({ success: false, message: "Không hợp lệ" });
+    }
 
     // Người dùng không được phép cập nhật tài khoản hoặc không tìm thấy tài khoản
     if (!updatedUser)

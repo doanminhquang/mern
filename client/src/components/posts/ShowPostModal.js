@@ -8,6 +8,7 @@ import Toast from "react-bootstrap/Toast";
 import { PostContext } from "../../contexts/PostContext";
 import { VideoContext } from "../../contexts/VideoContext";
 import { StudentContext } from "../../contexts/StudentContext";
+import { CommentContext } from "../../contexts/CommentContext";
 //---------------------------------------------------
 import { FaPhotoVideo } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
@@ -21,6 +22,7 @@ import ShowVideoModal from "../videos/ShowVideoModal";
 import { Markup } from "interweave";
 import { optionselect } from "../../utils/optionselect";
 //---------------------------------------------------
+import { Tab, Tabs } from "react-bootstrap";
 
 const ViewPostModal = () => {
   // Contexts
@@ -52,10 +54,19 @@ const ViewPostModal = () => {
     deleteStudent,
   } = useContext(StudentContext);
 
+  const {
+    commentState: { comments },
+    showToastC: { showC, messageC, typeC },
+    setShowToastC,
+    deleteComment,
+  } = useContext(CommentContext);
+
   // State
   const [showPost, setshowPost] = useState(post);
   const [textSreach, setTextSreach] = useState(null);
   const [textSreachS, setTextSreachS] = useState(null);
+  const [textSreachC, setTextSreachC] = useState(null);
+  const [key, setKey] = useState("Description");
 
   useEffect(() => setshowPost(post), [post]);
 
@@ -117,21 +128,31 @@ const ViewPostModal = () => {
         >
           <Button
             title={"Xem " + item.title}
-            style={{ background: "transparent", border: 0 }}
+            style={{
+              background: "transparent",
+              border: 0,
+              padding: 0,
+              paddingRight: 10,
+            }}
             onClick={showVideo.bind(this, item._id)}
           >
             <FaEye size="24" color="black" />
           </Button>
           <Button
             title={"Sửa " + item.title}
-            style={{ background: "transparent", border: 0 }}
+            style={{
+              background: "transparent",
+              border: 0,
+              padding: 0,
+              paddingRight: 10,
+            }}
             onClick={choosePost.bind(this, item._id)}
           >
             <FaEdit color="green" size="24" />
           </Button>
           <Button
             title={"Xóa video " + item.title}
-            style={{ background: "transparent", border: 0 }}
+            style={{ background: "transparent", border: 0, padding: 0 }}
             onClick={DeleteVideo.bind(this, item._id)}
           >
             <FaTimes color="red" size="24" />
@@ -209,7 +230,7 @@ const ViewPostModal = () => {
         >
           <Button
             title={"Xóa học viên " + item.user.name}
-            style={{ background: "transparent", border: 0 }}
+            style={{ background: "transparent", border: 0, padding: 0 }}
             onClick={DeleteStudent.bind(this, item._id)}
           >
             <FaTimes color="red" size="24" />
@@ -253,6 +274,261 @@ const ViewPostModal = () => {
 
   ////////////////////////////////////
 
+  const DeleteComment = async (commentId) => {
+    const { success, message } = await deleteComment(commentId);
+    setShowToastC({
+      showC: true,
+      messageC: message ? message : "Xóa thành công",
+      typeC: success ? "success" : "danger",
+    });
+  };
+
+  const renderC = (item, i) => {
+    return (
+      <li
+        key={i}
+        style={{
+          height: "39px",
+        }}
+      >
+        <div
+          style={{
+            width: "fit-content",
+            display: "inline",
+          }}
+        >
+          {item.user.name} : {item.cmt} : ({item.rating})
+        </div>
+        <div
+          style={{
+            width: "fit-content",
+            display: "inline",
+            float: "right",
+            marginRight: "10px",
+          }}
+        >
+          <Button
+            title={"Xóa bình luận " + item.cmt}
+            style={{ background: "transparent", border: 0, padding: 0 }}
+            onClick={DeleteComment.bind(this, item._id)}
+          >
+            <FaTimes color="red" size="24" />
+          </Button>
+        </div>
+      </li>
+    );
+  };
+
+  let countC = 0;
+  let countcomment = 0;
+
+  const incCountC = () => {
+    countC++;
+  };
+
+  const incCountComment = () => {
+    countcomment++;
+  };
+
+  let jsxcomment = comments
+    ? comments.map((item, i) => {
+        if (item.post === post._id) {
+          incCountComment();
+          return !textSreachC
+            ? renderC(item, i)
+            : item.user.name.toLowerCase().search(textSreachC.toLowerCase()) !==
+                -1 ||
+              item.cmt.toLowerCase().search(textSreachC.toLowerCase()) !== -1
+            ? renderC(item, i)
+            : incCountC();
+        }
+      })
+    : "";
+
+  if (countC === countcomment && countcomment !== 0) {
+    var strS =
+      "Không bình luận, hoặc người bình luận phù hợp '<b>" +
+      textSreachC +
+      "</b>' mà bạn tìm kiếm";
+    jsxcomment = <Markup content={strS} />;
+  }
+
+  const onChangeSreachC = (event) => setTextSreachC(event.target.value);
+
+  const jsxtab1 = (
+    <>
+      <center>
+        <img
+          src={thumbnail}
+          alt="thumbnail"
+          style={{ maxWidth: "100%", marginBottom: "10px" }}
+        />
+      </center>
+      <Markup content={description} />
+    </>
+  );
+
+  const jsxtab2 = (
+    <>
+      <div
+        style={{
+          paddingRight: "10px",
+          height: "44px",
+        }}
+      >
+        <Button
+          title="Thêm video bài học"
+          className="post-button"
+          onClick={showAddVideo.bind(this, post._id)}
+          style={{ marginLeft: "10px" }}
+        >
+          <FaPhotoVideo color="green" size="24" />
+        </Button>
+        <b>Danh sách bài học ({countvideo} bài):</b>
+        <Form.Group
+          style={{
+            width: "30%",
+            display: "inline",
+            float: "right",
+            margin: 0,
+          }}
+        >
+          <Form.Control
+            type="text"
+            placeholder="Nhập tên bài học..."
+            name="s"
+            value={textSreach}
+            onChange={onChangeSreach}
+          />
+        </Form.Group>
+      </div>
+      <div
+        style={{
+          height: "fit-content",
+          display: "block",
+          position: "relative",
+          minHeight: "200px",
+          maxHeight: "200px",
+          overflow: "scroll",
+          marginTop: "10px",
+        }}
+      >
+        <ul style={{ listStyle: "decimal-leading-zero" }}>{jsxvideo}</ul>
+      </div>
+    </>
+  );
+
+  const jsxtab3 = (
+    <>
+      <div
+        style={{
+          height: "44px",
+          marginTop: "10px",
+          paddingRight: "10px",
+        }}
+      >
+        {countstudent !== 0 ? (
+          <>
+            <b>Danh học viên ({countstudent} người):</b>
+            <Form.Group
+              style={{
+                width: "30%",
+                display: "inline",
+                float: "right",
+                margin: 0,
+              }}
+            >
+              <Form.Control
+                type="text"
+                placeholder="Nhập tên học viên..."
+                name="s"
+                value={textSreachS}
+                onChange={onChangeSreachS}
+              />
+            </Form.Group>
+          </>
+        ) : (
+          ""
+        )}
+      </div>
+      {countstudent !== 0 ? (
+        <>
+          <div
+            style={{
+              height: "fit-content",
+              display: "block",
+              position: "relative",
+              minHeight: "200px",
+              maxHeight: "200px",
+              overflow: "scroll",
+              marginTop: "10px",
+            }}
+          >
+            <ul style={{ listStyle: "decimal-leading-zero" }}>{jsxstudent}</ul>
+          </div>
+        </>
+      ) : (
+        ""
+      )}
+    </>
+  );
+
+  const jsxtab4 = (
+    <>
+      <div
+        style={{
+          height: "44px",
+          marginTop: "10px",
+          paddingRight: "10px",
+        }}
+      >
+        {countcomment !== 0 ? (
+          <>
+            <b>Danh bình luận ({countcomment} bình luận):</b>
+            <Form.Group
+              style={{
+                width: "30%",
+                display: "inline",
+                float: "right",
+                margin: 0,
+              }}
+            >
+              <Form.Control
+                type="text"
+                placeholder="Nhập bình luận hoặc tên người bình luận.."
+                name="c"
+                value={textSreachC}
+                onChange={onChangeSreachC}
+              />
+            </Form.Group>
+          </>
+        ) : (
+          ""
+        )}
+      </div>
+      {countcomment !== 0 ? (
+        <>
+          <div
+            style={{
+              height: "fit-content",
+              display: "block",
+              position: "relative",
+              minHeight: "200px",
+              maxHeight: "200px",
+              overflow: "scroll",
+              marginTop: "10px",
+            }}
+          >
+            <ul style={{ listStyle: "decimal-leading-zero" }}>{jsxcomment}</ul>
+          </div>
+        </>
+      ) : (
+        ""
+      )}
+    </>
+  );
+
+  ////////////////////////////////////
   return (
     <>
       <Modal show={showPostModal} onHide={closeDialog} size="xl" centered>
@@ -266,111 +542,40 @@ const ViewPostModal = () => {
             <br />
             <small style={{ float: "right", right: 0 }}>
               Đăng tải bởi{" "}
-              <p style={{ color: "#1261A0", display: "inline" }}>
+              <p style={{ color: "#603ce4", display: "inline" }}>
                 {post.user.name}
               </p>
             </small>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ color: "black", textAlign: "justify" }}>
-          <div style={{ height: "89%", overflow: "scroll" }}>
-            <center>
-              <img
-                src={thumbnail}
-                alt=""
-                style={{ maxWidth: "100%", marginBottom: "10px" }}
-              />
-            </center>
-            <Markup content={description} />
-            <div
-              style={{
-                paddingRight: "10px",
-              }}
-            >
-              <Button
-                title="Thêm video bài học"
-                className="post-button"
-                onClick={showAddVideo.bind(this, post._id)}
-                style={{ marginLeft: "10px" }}
-              >
-                <FaPhotoVideo color="green" size="24" />
-              </Button>
-              <b>Danh sách bài học ({countvideo} bài):</b>
-              <Form.Group
-                style={{
-                  width: "30%",
-                  display: "inline",
-                  float: "right",
-                  margin: 0,
-                }}
-              >
-                <Form.Control
-                  type="text"
-                  placeholder="Nhập tên bài học..."
-                  name="s"
-                  value={textSreach}
-                  onChange={onChangeSreach}
-                />
-              </Form.Group>
-            </div>
-            <div
-              style={{
-                height: "fit-content",
-                display: "block",
-                position: "relative",
-                maxHeight: "200px",
-                overflow: "scroll",
-                marginTop: "10px",
-              }}
-            >
-              <ul style={{ listStyle: "decimal-leading-zero" }}>{jsxvideo}</ul>
-            </div>
-            <div
-              style={{
-                height: "40px",
-                marginTop: "10px",
-                paddingRight: "10px",
-              }}
-            >
-              {countstudent !== 0 ? (
-                <>
-                  <b>Danh học viên ({countstudent} người):</b>
-                  <Form.Group
-                    style={{
-                      width: "30%",
-                      display: "inline",
-                      float: "right",
-                      margin: 0,
-                    }}
-                  >
-                    <Form.Control
-                      type="text"
-                      placeholder="Nhập tên học viên..."
-                      name="s"
-                      value={textSreachS}
-                      onChange={onChangeSreachS}
-                    />
-                  </Form.Group>
-                </>
-              ) : (
-                ""
-              )}
-            </div>
-            <div
-              style={{
-                height: "fit-content",
-                display: "block",
-                position: "relative",
-                maxHeight: "200px",
-                overflow: "scroll",
-                marginTop: "10px",
-              }}
-            >
-              <ul style={{ listStyle: "decimal-leading-zero" }}>
-                {jsxstudent}
-              </ul>
-            </div>
-          </div>
+          <Tabs
+            id="controlled-tab-example"
+            activeKey={key}
+            onSelect={(k) => setKey(k)}
+            className="mb-3"
+          >
+            <Tab eventKey="Description" title="Mô tả bài viết">
+              {jsxtab1}
+            </Tab>
+            <Tab eventKey="Video" title="Bài học">
+              {jsxtab2}
+            </Tab>
+            {countstudent === 0 ? (
+              <Tab eventKey="Student" title="Học viên đăng ký" disabled></Tab>
+            ) : (
+              <Tab eventKey="Student" title="Học viên đăng ký">
+                {jsxtab3}
+              </Tab>
+            )}
+            {countcomment === 0 ? (
+              <Tab eventKey="Cmt" title="Bình Luận" disabled></Tab>
+            ) : (
+              <Tab eventKey="Cmt" title="Bình Luận">
+                {jsxtab4}
+              </Tab>
+            )}
+          </Tabs>
           <Form.Group>
             <Form.Control
               as="select"
@@ -397,14 +602,14 @@ const ViewPostModal = () => {
       {video !== null && showVideoModal && <ShowVideoModal />}
       {/* After video is added, show toast */}
       <Toast
-        show={showV ? showV : showS}
+        show={showV ? showV : showS ? showS : showC}
         style={{
           position: "fixed",
           top: "20%",
           right: "10px",
           zIndex: "9999999999999999999",
         }}
-        className={`bg-${showV ? typeV : typeS} text-white`}
+        className={`bg-${showV ? typeV : showS ? typeS : typeC} text-white`}
         onClose={
           showV
             ? setShowToastV.bind(this, {
@@ -412,17 +617,23 @@ const ViewPostModal = () => {
                 messageV: "",
                 typeV: null,
               })
-            : setShowToastS.bind(this, {
+            : showS
+            ? setShowToastS.bind(this, {
                 showS: false,
                 messageS: "",
                 typeS: null,
+              })
+            : setShowToastC.bind(this, {
+                showC: false,
+                messageC: "",
+                typeC: null,
               })
         }
         delay={3000}
         autohide
       >
         <Toast.Body>
-          <strong>{showV ? messageV : messageS}</strong>
+          <strong>{showV ? messageV : showS ? messageS : messageC}</strong>
         </Toast.Body>
       </Toast>
     </>
