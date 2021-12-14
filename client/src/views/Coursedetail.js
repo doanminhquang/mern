@@ -345,14 +345,16 @@ const Coursedetail = (props) => {
     setshowvideo(!showvideo);
   };
 
-  const updateidx = async (index) => {
+  const updateidx = async (idx) => {
     try {
-      index = index + 1;
-      const response = await axios.put(`${apiUrl}/students/${id_std}`, {
-        index,
-      });
-      if (response.data.success) {
-        if (response.data.message === "Đã cập nhật tiến độ!") check();
+      idx = idx + 1;
+      if (idx > index) {
+        const response = await axios.put(`${apiUrl}/students/${id_std}`, {
+          index: idx,
+        });
+        if (response.data.success) {
+          if (response.data.message === "Đã cập nhật tiến độ!") check();
+        }
       }
     } catch (error) {
       console.log(error);
@@ -391,7 +393,11 @@ const Coursedetail = (props) => {
                     style={{ background: "transparent", border: 0, padding: 0 }}
                     onClick={showVideo.bind(this, item._id, i)}
                   >
-                    <FaEye size="24" color="black" />
+                    {i < index ? (
+                      <FaEye size="24" color="green" />
+                    ) : (
+                      <FaEye size="24" color="black" />
+                    )}
                   </Button>
                 </a>
               ) : (
