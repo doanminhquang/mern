@@ -52,6 +52,9 @@ const Coursedetail = (props) => {
   const [data, setData] = useState(null);
   const [textSreach, setTextSreach] = useState(null);
   const [reg, setreg] = useState(true);
+  const [index, setindex] = useState(-1);
+  const [idxclick, setidxclick] = useState(0);
+  const [id_std, setid_std] = useState(0);
   const [tab, settab] = useState(0);
   const [showvideo, setshowvideo] = useState(false);
   const [listcmt, setListcmt] = useState([]);
@@ -119,7 +122,10 @@ const Coursedetail = (props) => {
     setData(null);
     setTextSreach(null);
     setreg(true);
+    setindex(-1);
     settab(0);
+    setid_std(0);
+    setidxclick(0);
     setshowvideo(false);
     setListcmt([]);
     setListcmtdetail([]);
@@ -180,14 +186,21 @@ const Coursedetail = (props) => {
   const check = async () => {
     if (!isAuthenticated) {
       setreg(true);
+      setindex(-1);
+      setid_std(0);
     } else {
       try {
         const response = await axios.get(`${apiUrl}/students/check/${id}`);
         if (response.data.success)
           if (response.data.students.length !== 0) {
             setreg(false);
+            console.log(response.data.students);
+            setindex(response.data.students[0].index);
+            setid_std(response.data.students[0]._id);
           } else {
             setreg(true);
+            setindex(-1);
+            setid_std(0);
           }
       } catch (error) {
         console.log(error);
@@ -200,14 +213,14 @@ const Coursedetail = (props) => {
     let componentMounted = true;
     const fetchData = async () => {
       if (componentMounted) {
-        if (videos.length !== 0) check();
+        check();
       }
     };
     fetchData();
     return () => {
       componentMounted = false;
     };
-  }, [videos]);
+  }, []);
 
   useEffect(() => {
     let componentMounted = true;
@@ -271,6 +284,8 @@ const Coursedetail = (props) => {
       const response = await axios.post(`${apiUrl}/students/`, newStudent);
       if (response.data.success) {
         setreg(false);
+        setindex(response.data.student.index);
+        setid_std(response.data.student._id);
         return response.data;
       }
     } catch (error) {
@@ -285,11 +300,13 @@ const Coursedetail = (props) => {
     const { success, message } = await regp({
       postid: id,
     });
-    setShowToastS({
-      showS: true,
-      messageS: message,
-      typeS: success ? "success" : "danger",
-    });
+    if (message === "Bạn đã đăng ký từ trước vui lòng thử lại") check();
+    else
+      setShowToastS({
+        showS: true,
+        messageS: message,
+        typeS: success ? "success" : "danger",
+      });
   };
 
   //
@@ -301,6 +318,8 @@ const Coursedetail = (props) => {
       );
       if (response.data.success) {
         setreg(true);
+        setindex(-1);
+        setid_std(0);
         return response.data;
       }
     } catch (error) {
@@ -326,9 +345,25 @@ const Coursedetail = (props) => {
     setshowvideo(!showvideo);
   };
 
-  const showVideo = (videoId) => {
+  const updateidx = async (index) => {
+    try {
+      index = index + 1;
+      const response = await axios.put(`${apiUrl}/students/${id_std}`, {
+        index,
+      });
+      if (response.data.success) {
+        if (response.data.message === "Đã cập nhật tiến độ!") check();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const showVideo = (videoId, i) => {
     findVideo(videoId);
-    setShowVideoModal(videoId);
+    setShowVideoModal(true);
+    updateidx(i);
+    setidxclick(i);
   };
 
   const render = (item, i) => {
@@ -349,16 +384,18 @@ const Coursedetail = (props) => {
                 <a className="lock">
                   <FaLock />
                 </a>
-              ) : (
+              ) : i <= index ? (
                 <a className="lock">
                   <Button
                     title={"Xem " + item.title}
                     style={{ background: "transparent", border: 0, padding: 0 }}
-                    onClick={showVideo.bind(this, item._id)}
+                    onClick={showVideo.bind(this, item._id, i)}
                   >
                     <FaEye size="24" color="black" />
                   </Button>
                 </a>
+              ) : (
+                ""
               )}
             </div>
           </div>
@@ -1335,8 +1372,46 @@ const Coursedetail = (props) => {
     setShowToast({ show: true, message, type: success ? "success" : "danger" });
   };
 
+  const NextorPrevVideo = (index) => {
+    findVideo(videos[index]._id);
+    setidxclick(index);
+    updateidx(index);
+  };
+
   return (
     <>
+      {/* btn next and prev */}
+      {video !== null && showVideoModal && idxclick > 0 && (
+        <div
+          style={{
+            position: "fixed",
+            zIndex: "9999",
+            left: 0,
+            top: "50%",
+            MsTransform: "translateY(-50%)",
+            transform: "translateY(-50%)",
+            marginLeft: 20,
+            left: 0,
+          }}
+        >
+          <Button onClick={() => NextorPrevVideo(idxclick - 1)}>{"<"}</Button>
+        </div>
+      )}
+      {video !== null && showVideoModal && idxclick < videos.length - 1 && (
+        <div
+          style={{
+            position: "fixed",
+            zIndex: "9999",
+            top: "50%",
+            MsTransform: "translateY(-50%)",
+            transform: "translateY(-50%)",
+            marginRight: 20,
+            right: 0,
+          }}
+        >
+          <Button onClick={() => NextorPrevVideo(idxclick + 1)}>{">"}</Button>
+        </div>
+      )}
       {/* add modal */}
       {videos.length === 0 ? (
         <Modal

@@ -7,6 +7,7 @@ const Post = require("../models/Post");
 const User = require("../models/User");
 const Post_Detail = require("../models/Post_Detail");
 const Student = require("../models/Students");
+const Comment = require("../models/Comments");
 
 // @route GET api/posts
 // @desc Get posts
@@ -197,6 +198,20 @@ router.get("/myenrolls/:id", verifyToken, async (req, res) => {
       { $unset: "info" },
       {
         $lookup: {
+          from: "post_details",
+          localField: "post._id",
+          foreignField: "post",
+          as: "listvideo",
+        },
+      },
+      {
+        $addFields: {
+          countvideo: { $size: "$listvideo" },
+        },
+      },
+      { $unset: "listvideo" },
+      {
+        $lookup: {
           from: "comments",
           localField: "_id",
           foreignField: "post",
@@ -213,7 +228,6 @@ router.get("/myenrolls/:id", verifyToken, async (req, res) => {
           countrating: { $size: "$cmt" },
         },
       },
-
       {
         $addFields: {
           avgrating: {
@@ -610,6 +624,23 @@ router.delete("/:id", verifyToken, async (req, res) => {
       else studentDeleteCondition = { post: req.params.id, user: req.userId };
       const deletedstudent = await Student.deleteMany(studentDeleteCondition);
       if (!deletedstudent)
+        return res.status(401).json({
+          success: false,
+          message:
+            "Không tìm thấy học viên liên quan hoặc người dùng không được ủy quyền",
+        });
+    }
+
+    // Kiểm tra Comment đã tồn tại hay chưa
+    const OneComment = await Comment.findOne({ post: req.params.id });
+
+    if (OneComment) {
+      // Bổ xung xóa Comment liên quan
+      if (permission.type == "admin")
+        CommentDeleteCondition = { post: req.params.id };
+      else CommentDeleteCondition = { post: req.params.id, user: req.userId };
+      const deletedComment = await Comment.deleteMany(CommentDeleteCondition);
+      if (!deletedComment)
         return res.status(401).json({
           success: false,
           message:

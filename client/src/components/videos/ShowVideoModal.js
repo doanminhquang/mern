@@ -4,7 +4,7 @@ import { useContext, useState, useEffect } from "react";
 //-----------------------------------------
 import { VideoContext } from "../../contexts/VideoContext";
 
-const ShowVideoModal = () => {
+const ShowVideoModal = (props) => {
   // Contexts
   const {
     videoState: { video },

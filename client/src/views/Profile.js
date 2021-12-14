@@ -219,6 +219,10 @@ export default function Profile() {
     setShowToast({ show: true, message, type: success ? "success" : "danger" });
   };
 
+  const percent = (value1, value2) => {
+    return value1 !== 0 ? Math.round((value1 / value2) * 100) : 0;
+  };
+
   return (
     <>
       <Preload />
@@ -408,6 +412,7 @@ export default function Profile() {
                                   <tr>
                                     <th className="course">Tên khóa học</th>
                                     <th className="date">Ngày đăng ký</th>
+                                    <th>Tiến độ</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -429,6 +434,44 @@ export default function Profile() {
                                         </td>
                                         <td className="date">
                                           {formatDate(item.createdAt)}
+                                        </td>
+                                        <td>
+                                          <div
+                                            style={{
+                                              display: "flex",
+                                              justifyContent: "space-between",
+                                              width: "240px",
+                                            }}
+                                          >
+                                            {percent(
+                                              item.index,
+                                              item.countvideo
+                                            )}
+                                            %
+                                            <div
+                                              className="progress"
+                                              style={{
+                                                width: "75%",
+                                              }}
+                                            >
+                                              <div
+                                                className="progress-bar"
+                                                role="progressbar"
+                                                style={{
+                                                  width: `${percent(
+                                                    item.index,
+                                                    item.countvideo
+                                                  )}%`,
+                                                }}
+                                                aria-valuenow={percent(
+                                                  item.index,
+                                                  item.countvideo
+                                                )}
+                                                aria-valuemin={0}
+                                                aria-valuemax={100}
+                                              />
+                                            </div>
+                                          </div>
                                         </td>
                                       </tr>
                                     ))

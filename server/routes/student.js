@@ -3,7 +3,6 @@ const router = express.Router();
 const verifyToken = require("../middleware/auth");
 
 const Student = require("../models/Students");
-const User = require("../models/User");
 
 // @route GET api/students
 // @desc Get student
@@ -44,9 +43,18 @@ router.get("/check/:id", verifyToken, async (req, res) => {
 router.post("/", verifyToken, async (req, res) => {
   const { postid } = req.body;
   try {
+    // Kiểm tra user đã tồn tại hay chưa
+    const check = await Student.findOne({ post: postid, user: req.userId });
+    if (check)
+      return res.status(400).json({
+        success: false,
+        message: "Bạn đã đăng ký từ trước vui lòng thử lại",
+      });
+
     const newStudent = new Student({
       user: req.userId,
       post: postid,
+      index: 0,
     });
 
     await newStudent.save();
@@ -106,6 +114,57 @@ router.delete("/:id", verifyToken, async (req, res) => {
       });
 
     res.json({ success: true, student: deleteStudent });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" });
+  }
+});
+
+// @route PUT api/students
+// @desc Update students index
+// @access Private
+router.put("/:id", verifyToken, async (req, res) => {
+  const { index } = req.body;
+
+  // Validation cơ bản
+  if (!index)
+    return res
+      .status(400)
+      .json({ success: false, message: "Chỉ số lưu vết là bắt buộc" });
+
+  const stock = await Student.findById(req.params.id);
+
+  try {
+    if (index > stock.index) {
+      let updatedStudent = {
+        post: stock.post,
+        user: req.userId,
+        index,
+      };
+      var studentUpdateCondition = { _id: req.params.id };
+      updatedStudent = await Student.findOneAndUpdate(
+        studentUpdateCondition,
+        updatedStudent,
+        { new: true }
+      );
+      // Người dùng không được phép cập nhật hoặc không tìm thấy
+      if (!updatedStudent)
+        return res.status(401).json({
+          success: false,
+          message: "Không tìm thấy hoặc người dùng không được ủy quyền",
+        });
+
+      res.json({
+        success: true,
+        message: "Đã cập nhật tiến độ!",
+        post: updatedStudent,
+      });
+    } else {
+      res.json({
+        success: true,
+        message: "Chưa cần cập nhật!",
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" });

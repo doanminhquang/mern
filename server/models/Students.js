@@ -5,10 +5,16 @@ const ListStudentSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: "users",
+    required: true,
   },
   post: {
     type: Schema.Types.ObjectId,
     ref: "posts",
+    required: true,
+  },
+  index: {
+    type: Number,
+    required: true,
   },
   createdAt: {
     type: Date,

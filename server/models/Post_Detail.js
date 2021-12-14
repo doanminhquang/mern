@@ -12,10 +12,12 @@ const PostDetailsSchema = new Schema({
   post: {
     type: Schema.Types.ObjectId,
     ref: "posts",
+    required: true,
   },
   user: {
     type: Schema.Types.ObjectId,
     ref: "users",
+    required: true,
   },
   createdAt: {
     type: Date,

@@ -204,6 +204,10 @@ const ViewPostModal = () => {
     });
   };
 
+  const percent = (value) => {
+    return value !== 0 ? Math.round((value / countvideo) * 100) : 0;
+  };
+
   const renderS = (item, i) => {
     return (
       <li
@@ -218,7 +222,7 @@ const ViewPostModal = () => {
             display: "inline",
           }}
         >
-          {item.user.name}
+          {item.user.name} - {percent(item.index)}%
         </div>
         <div
           style={{

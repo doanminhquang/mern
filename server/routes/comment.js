@@ -79,6 +79,14 @@ router.get("/:id", async (req, res) => {
 router.post("/", verifyToken, async (req, res) => {
   const { post, cmt, rating } = req.body;
   try {
+    // Kiểm tra user đã tồn tại bình luận hay chưa
+    const check = await Comment.findOne({ post, user: req.userId });
+    if (check)
+      return res.status(400).json({
+        success: false,
+        message: "Bạn đã bình luận không thể bình luận thêm",
+      });
+
     if (post === "")
       return res
         .status(400)
