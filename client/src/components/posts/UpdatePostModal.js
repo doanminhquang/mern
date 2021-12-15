@@ -149,7 +149,10 @@ const UpdatePostModal = () => {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={closeDialog}>
+          <Button
+            style={{ background: "rgb(96 60 228 / 82%)", border: "none" }}
+            onClick={closeDialog}
+          >
             Hủy
           </Button>
           <Button
