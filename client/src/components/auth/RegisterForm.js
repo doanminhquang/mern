@@ -14,11 +14,15 @@ const RegisterForm = () => {
     email: "",
     confirmPassword: "",
     name: "",
+    phone: "",
   });
 
   const [alert, setAlert] = useState(null);
 
-  const { username, email, password, confirmPassword, name } = registerForm;
+  const { username, email, password, confirmPassword, name, phone } =
+    registerForm;
+
+  const [from, setForm] = useState(0);
 
   const onChangeRegisterForm = (event) =>
     setRegisterForm({
@@ -46,94 +50,165 @@ const RegisterForm = () => {
     }
   };
 
+  const Next = (e) => {
+    e.preventDefault();
+    if (!username || !email || !name) {
+      setAlert({ type: "danger", message: "Vui lòng nhập đủ thông tin" });
+      setTimeout(() => setAlert(null), 5000);
+    } else {
+      setForm(1);
+    }
+  };
+
+  const Prev = (e) => {
+    e.preventDefault();
+    setForm(0);
+  };
+
   return (
     <>
       <div className="auth-form-light text-left p-5">
         <form className="pt-3" onSubmit={register}>
-          <div className="form-group">
-            <input
-              style={{
-                fontSize: "0.95rem",
-              }}
-              type="text"
-              className="form-control form-control-lg"
-              placeholder="Tên"
-              name="name"
-              required
-              value={name}
-              onChange={onChangeRegisterForm}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              style={{
-                fontSize: "0.95rem",
-              }}
-              type="text"
-              className="form-control form-control-lg"
-              placeholder="Tài Khoản"
-              name="username"
-              required
-              value={username}
-              onChange={onChangeRegisterForm}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              style={{
-                fontSize: "0.95rem",
-              }}
-              type="text"
-              className="form-control form-control-lg"
-              placeholder="Địa Chỉ email"
-              name="email"
-              required
-              value={email}
-              onChange={onChangeRegisterForm}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              style={{
-                fontSize: "0.95rem",
-              }}
-              type="password"
-              className="form-control form-control-lg"
-              placeholder="Mật Khẩu"
-              name="password"
-              required
-              value={password}
-              onChange={onChangeRegisterForm}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              style={{
-                fontSize: "0.95rem",
-              }}
-              type="password"
-              className="form-control form-control-lg"
-              placeholder="Nhập lại Mật Khẩu"
-              name="confirmPassword"
-              required
-              value={confirmPassword}
-              onChange={onChangeRegisterForm}
-            />
-          </div>
+          {from === 0 ? (
+            <>
+              <div className="form-group">
+                <input
+                  style={{
+                    fontSize: "0.95rem",
+                  }}
+                  type="text"
+                  className="form-control form-control-lg"
+                  placeholder="Tên"
+                  name="name"
+                  required
+                  value={name}
+                  onChange={onChangeRegisterForm}
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  style={{
+                    fontSize: "0.95rem",
+                  }}
+                  type="text"
+                  className="form-control form-control-lg"
+                  placeholder="Tài Khoản"
+                  name="username"
+                  required
+                  value={username}
+                  onChange={onChangeRegisterForm}
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  style={{
+                    fontSize: "0.95rem",
+                  }}
+                  type="text"
+                  className="form-control form-control-lg"
+                  placeholder="Địa Chỉ email"
+                  name="email"
+                  required
+                  value={email}
+                  onChange={onChangeRegisterForm}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="form-group">
+                <input
+                  style={{
+                    fontSize: "0.95rem",
+                  }}
+                  type="number"
+                  className="form-control form-control-lg"
+                  placeholder="Số điện thoại"
+                  name="phone"
+                  required
+                  value={phone}
+                  onChange={onChangeRegisterForm}
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  style={{
+                    fontSize: "0.95rem",
+                  }}
+                  type="password"
+                  className="form-control form-control-lg"
+                  placeholder="Mật Khẩu"
+                  name="password"
+                  required
+                  value={password}
+                  onChange={onChangeRegisterForm}
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  style={{
+                    fontSize: "0.95rem",
+                  }}
+                  type="password"
+                  className="form-control form-control-lg"
+                  placeholder="Nhập lại Mật Khẩu"
+                  name="confirmPassword"
+                  required
+                  value={confirmPassword}
+                  onChange={onChangeRegisterForm}
+                />
+              </div>
+            </>
+          )}
           <div className="mt-3">
-            <button
-              className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
-              type="submit"
-              style={{
-                fontFamily: "-webkit-body",
-                fontWidth: "bold",
-                fontWeight: "bold",
-                fontSize: "1rem",
-                backgroundColor: "#603ce4",
-              }}
-            >
-              Đăng ký
-            </button>
+            {from === 0 ? (
+              <button
+                className="btn btn-block btn-lg font-weight-medium auth-form-btn"
+                style={{
+                  fontFamily: "-webkit-body",
+                  fontWidth: "bold",
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  backgroundColor: "#603ce4",
+                  color: "white",
+                }}
+                onClick={(e) => Next(e)}
+              >
+                Tiếp
+              </button>
+            ) : (
+              <>
+                <button
+                  className="btn font-weight-medium auth-form-btn"
+                  style={{
+                    fontFamily: "-webkit-body",
+                    fontWidth: "bold",
+                    fontWeight: "bold",
+                    fontSize: "1rem",
+                    backgroundColor: "#603ce4",
+                    color: "white",
+                    marginRight: 5,
+                  }}
+                  onClick={(e) => Prev(e)}
+                >
+                  Quay Lại
+                </button>
+                <button
+                  className="btn font-weight-medium auth-form-btn"
+                  type="submit"
+                  style={{
+                    fontFamily: "-webkit-body",
+                    fontWidth: "bold",
+                    fontWeight: "bold",
+                    fontSize: "1rem",
+                    backgroundColor: "#603ce4",
+                    color: "white",
+                  }}
+                >
+                  Đăng ký
+                </button>
+              </>
+            )}
           </div>
           <div
             className="text-center mt-4 font-weight-light"
@@ -142,6 +217,11 @@ const RegisterForm = () => {
             Bạn đã có tài khoản?{" "}
             <Link to="/login" style={{ color: "#603ce4" }}>
               Đăng nhập ngay
+            </Link>
+            <br />
+            <br />
+            <Link to="/forgot" style={{ color: "#603ce4" }}>
+              Quên mật khẩu
             </Link>
           </div>
         </form>

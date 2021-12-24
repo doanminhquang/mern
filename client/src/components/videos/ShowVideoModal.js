@@ -21,6 +21,15 @@ const ShowVideoModal = (props) => {
     setShowVideoModal(false);
   };
 
+  const checkurl = (val) => {
+    var tempstr = val;
+    return !tempstr.includes(".mp4");
+  };
+
+  const renderurl = (val) => {
+    return process.env.REACT_APP_DOMAIN + val.substring(1);
+  };
+
   return (
     <Modal show={showVideoModal} onHide={closeDialog} size="xl">
       <Modal.Header closeButton>
@@ -36,11 +45,19 @@ const ShowVideoModal = (props) => {
       <Modal.Body>
         <center>
           <div className="fluidMedia" style={{ width: "80%" }}>
-            <iframe
-              frameborder="0"
-              title={showVideo.title}
-              src={showVideo.video}
-            ></iframe>
+            {checkurl(showVideo.video) ? (
+              <iframe
+                frameborder="0"
+                title={showVideo.title}
+                src={showVideo.video}
+              ></iframe>
+            ) : (
+              <video
+                src={renderurl(showVideo.video)}
+                style={{ width: "100%", marginTop: "10px" }}
+                controls
+              />
+            )}
           </div>
         </center>
       </Modal.Body>

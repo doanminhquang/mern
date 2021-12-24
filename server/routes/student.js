@@ -12,7 +12,7 @@ router.get("", verifyToken, async (req, res) => {
     const students = await Student.find({})
       .populate("user", ["name", "username", "avatar"])
       .sort({
-        createdAt: +1,
+        createdAt: -1,
       });
     res.json({ success: true, students });
   } catch (error) {
@@ -75,7 +75,7 @@ router.post("/", verifyToken, async (req, res) => {
 // @access Private
 router.delete("/unreg/:id", verifyToken, async (req, res) => {
   try {
-    const studentDeleteCondition = { user: req.params.id };
+    const studentDeleteCondition = { post: req.params.id, user: req.userId };
     const deleteStudent = await Student.findOneAndDelete(
       studentDeleteCondition
     );
@@ -83,7 +83,7 @@ router.delete("/unreg/:id", verifyToken, async (req, res) => {
     if (!deleteStudent)
       return res.status(401).json({
         success: false,
-        message: "Không tìm thấy video hoặc người dùng không được ủy quyền",
+        message: "Không tìm thấy hoặc người dùng không được ủy quyền",
       });
 
     res.json({
@@ -110,7 +110,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
     if (!deleteStudent)
       return res.status(401).json({
         success: false,
-        message: "Không tìm thấy video hoặc người dùng không được ủy quyền",
+        message: "Không tìm thấy hoặc người dùng không được ủy quyền",
       });
 
     res.json({ success: true, student: deleteStudent });

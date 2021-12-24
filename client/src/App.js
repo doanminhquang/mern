@@ -56,6 +56,13 @@ function App() {
                             <Auth {...props} authRoute="register" />
                           )}
                         />
+                        <Route
+                          exact
+                          path="/forgot"
+                          render={(props) => (
+                            <Auth {...props} authRoute="forgot" />
+                          )}
+                        />
                         <Route exact path="/home" component={Home} />
                         <Route exact path="/courses" component={Courses} />
                         <Route

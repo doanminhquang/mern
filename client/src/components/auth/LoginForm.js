@@ -68,7 +68,7 @@ const LoginForm = () => {
           </div>
           <div className="mt-3">
             <button
-              className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
+              className="btn btn-block btn-lg font-weight-medium auth-form-btn"
               type="submit"
               style={{
                 fontFamily: "-webkit-body",
@@ -76,6 +76,7 @@ const LoginForm = () => {
                 fontWeight: "bold",
                 fontSize: "1rem",
                 backgroundColor: "#603ce4",
+                color: "white",
               }}
             >
               Đăng nhập
@@ -88,6 +89,11 @@ const LoginForm = () => {
             Bạn chưa có tài khoản?{" "}
             <Link to="/register" style={{ color: "#603ce4" }}>
               Đăng ký tài khoản
+            </Link>
+            <br />
+            <br />
+            <Link to="/forgot" style={{ color: "#603ce4" }}>
+              Quên mật khẩu
             </Link>
           </div>
         </form>

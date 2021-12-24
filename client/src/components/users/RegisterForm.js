@@ -19,9 +19,10 @@ const Register = () => {
     confirmPassword: "",
     name: "",
     type: "student",
+    phone: "",
   });
 
-  const { username, email, password, confirmPassword, name, type } =
+  const { username, email, password, confirmPassword, name, type, phone } =
     registerForm;
 
   const onChangeRegisterForm = (event) =>
@@ -71,6 +72,7 @@ const Register = () => {
       confirmPassword: "",
       name: "",
       type: "student",
+      phone: "",
     });
     setShowAddUserModal(false);
   };
@@ -126,6 +128,17 @@ const Register = () => {
             </Form.Group>
             <Form.Group>
               <Form.Control
+                type="text"
+                placeholder="Số điện thoại"
+                name="phone"
+                required
+                value={phone}
+                onChange={onChangeRegisterForm}
+                autoComplete="new-password"
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Control
                 type="password"
                 placeholder="Mật khẩu"
                 name="password"
@@ -162,7 +175,10 @@ const Register = () => {
             </Form.Group>
           </Modal.Body>
           <Modal.Footer style={{ padding: "5px" }}>
-            <Button variant="secondary" onClick={closeDialog}>
+            <Button
+              style={{ background: "rgb(96 60 228 / 82%)", border: "none" }}
+              onClick={closeDialog}
+            >
               Hủy
             </Button>
             <Button

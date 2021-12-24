@@ -23,6 +23,7 @@ import { Markup } from "interweave";
 import { optionselect } from "../../utils/optionselect";
 //---------------------------------------------------
 import { Tab, Tabs } from "react-bootstrap";
+import { formatDate } from "../../utils/FormatDate";
 
 const ViewPostModal = () => {
   // Contexts
@@ -222,7 +223,8 @@ const ViewPostModal = () => {
             display: "inline",
           }}
         >
-          {item.user.name} - {percent(item.index)}%
+          {formatDate(item.createdAt)} : {item.user.name} -{" "}
+          {percent(item.index)}%
         </div>
         <div
           style={{

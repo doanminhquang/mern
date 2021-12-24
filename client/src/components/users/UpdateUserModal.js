@@ -22,7 +22,7 @@ const UpdateUserModal = () => {
 
   useEffect(() => setUpdatedUser(user), [user]);
 
-  const { username, email, type, name, password } = updatedUser;
+  const { username, email, type, name, password, phone } = updatedUser;
 
   // Gen pass
 
@@ -152,6 +152,20 @@ const UpdateUserModal = () => {
                 Địa chỉ mail: {email}
               </option>
             </Form.Control>
+          </Form.Group>{" "}
+          <Form.Group style={{ marginBottom: 10 }}>
+            <Form.Control
+              as="select"
+              name="phone"
+              value={phone}
+              disabled={true}
+              className="select"
+              onChange={onChangeUpdatedUserForm}
+            >
+              <option key={phone} value={phone}>
+                Số điện thoại: {phone}
+              </option>
+            </Form.Control>
           </Form.Group>
           {GenPass ? (
             <Form.Group style={{ marginBottom: 10 }}>
@@ -209,7 +223,10 @@ const UpdateUserModal = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={closeDialog}>
+          <Button
+            style={{ background: "rgb(96 60 228 / 82%)", border: "none" }}
+            onClick={closeDialog}
+          >
             Hủy
           </Button>
           <Button

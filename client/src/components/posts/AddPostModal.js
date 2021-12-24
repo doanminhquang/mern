@@ -132,7 +132,7 @@ const AddPostModal = () => {
                 border: 0,
                 with: "100%",
               }}
-              onClick={hanlderClickUpload}
+              onClick={() => hanlderClickUpload()}
             >
               Vui lòng chọn ảnh <BiImageAdd />
               <input

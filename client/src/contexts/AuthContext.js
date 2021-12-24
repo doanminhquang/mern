@@ -88,6 +88,27 @@ const AuthContextProvider = ({ children }) => {
     });
   };
 
+  // Find user
+  const findUser = async (userForm) => {
+    try {
+      const response = await axios.post(`${apiUrl}/auth/check`, userForm);
+      return response.data;
+    } catch (error) {
+      if (error.response.data) return error.response.data;
+      else return { success: false, message: error.message };
+    }
+  };
+
+  // Check and changer passwords
+  const CheckCode = async (userForm) => {
+    try {
+      const response = await axios.post(`${apiUrl}/auth/forgot`, userForm);
+      return response.data;
+    } catch (error) {
+      if (error.response.data) return error.response.data;
+      else return { success: false, message: error.message };
+    }
+  };
   // Context data
   const authContextData = {
     loginUser,
@@ -95,6 +116,8 @@ const AuthContextProvider = ({ children }) => {
     logoutUser,
     authState,
     loadUser,
+    findUser,
+    CheckCode,
   };
 
   // Return provider

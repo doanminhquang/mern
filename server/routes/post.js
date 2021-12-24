@@ -8,6 +8,7 @@ const User = require("../models/User");
 const Post_Detail = require("../models/Post_Detail");
 const Student = require("../models/Students");
 const Comment = require("../models/Comments");
+const fs = require("fs");
 
 // @route GET api/posts
 // @desc Get posts
@@ -646,6 +647,12 @@ router.delete("/:id", verifyToken, async (req, res) => {
           message:
             "Không tìm thấy học viên liên quan hoặc người dùng không được ủy quyền",
         });
+    }
+
+    // Xóa folder video nếu tồn tại
+    const dir = "./filevideo/" + req.params.id;
+    if (fs.existsSync(dir)) {
+      fs.rmSync(dir, { recursive: true });
     }
 
     res.json({ success: true, post: deletedPost });

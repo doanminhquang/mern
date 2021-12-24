@@ -4,6 +4,8 @@ const argon2 = require("argon2");
 const verifyToken = require("../middleware/auth");
 
 const User = require("../models/User");
+const Student = require("../models/Students");
+const Comment = require("../models/Comments");
 
 // @route GET api/users
 // @desc Get users
@@ -41,13 +43,13 @@ router.get("/:id", verifyToken, async (req, res) => {
 // @desc Register user
 // @access Private
 router.post("/", verifyToken, async (req, res) => {
-  const { username, password, email, type, name } = req.body;
+  const { username, password, email, type, name, phone } = req.body;
 
   // Simple validation
-  if (!username || !password || !email || !name)
+  if (!username || !password || !email || !name || !phone)
     return res.status(400).json({
       success: false,
-      message: "Vui lòng kiểm tra họ tên, tên người dùng, email hoặc mật khẩu",
+      message: "Vui lòng kiểm tra các trường thtôngg tin",
     });
 
   try {
@@ -67,6 +69,14 @@ router.post("/", verifyToken, async (req, res) => {
         .status(400)
         .json({ success: false, message: "Địa chỉ email đã được sử dụng" });
 
+    // Kiểm tra phone đã tồn tại hay
+    const cphone = await User.findOne({ phone });
+
+    if (cphone)
+      return res
+        .status(400)
+        .json({ success: false, message: "Số điện thoại đã được sử dụng" });
+
     // Tất cả tốt
     const hashedPassword = await argon2.hash(password);
     const newUser = new User({
@@ -75,6 +85,7 @@ router.post("/", verifyToken, async (req, res) => {
       password: hashedPassword,
       type: type || "student",
       name,
+      phone,
     });
     await newUser.save();
 
@@ -93,7 +104,8 @@ router.post("/", verifyToken, async (req, res) => {
 // @desc Update user
 // @access Private
 router.put("/:id", verifyToken, async (req, res) => {
-  const { username, email, password, type, name, avatar, flag } = req.body;
+  const { username, email, password, type, name, avatar, flag, phone } =
+    req.body;
 
   let userUpdateCondition = "";
 
@@ -114,6 +126,7 @@ router.put("/:id", verifyToken, async (req, res) => {
       password: hashedPassword !== "" ? hashedPassword : password,
       type,
       avatar,
+      phone,
     };
 
     // const userUpdateCondition = { _id: req.params.id };
@@ -146,7 +159,8 @@ router.put("/:id", verifyToken, async (req, res) => {
 // @desc Update user
 // @access Private
 router.put("/myinfo/:id", verifyToken, async (req, res) => {
-  const { nusername, nemail, npassword, nname, navatar, ntype } = req.body;
+  const { nusername, nemail, npassword, nname, navatar, ntype, nphone } =
+    req.body;
   let stockpass = await User.findById(req.userId).select("password");
 
   let hashedPassword = "";
@@ -161,6 +175,7 @@ router.put("/myinfo/:id", verifyToken, async (req, res) => {
       password: hashedPassword !== "" ? hashedPassword : stockpass.password,
       type: ntype,
       avatar: navatar,
+      phone: nphone,
     };
 
     if (req.params.id === req.userId) {
@@ -214,6 +229,40 @@ router.delete("/:id", verifyToken, async (req, res) => {
         success: false,
         message: "Không tìm thấy tài khoản hoặc người dùng không được ủy quyền",
       });
+
+    // Kiểm tra Student đã tồn tại hay chưa
+    const OneStudent = await Student.findOne({ post: req.params.id });
+
+    if (OneStudent) {
+      // Bổ xung xóa Student liên quan
+      if (permission.type == "admin")
+        StudentDeleteCondition = { post: req.params.id };
+      else StudentDeleteCondition = { post: req.params.id, user: req.userId };
+      const deletedStudent = await Student.deleteMany(StudentDeleteCondition);
+      if (!deletedStudent)
+        return res.status(401).json({
+          success: false,
+          message:
+            "Không tìm thấy học viên liên quan hoặc người dùng không được ủy quyền",
+        });
+    }
+
+    // Kiểm tra Comment đã tồn tại hay chưa
+    const OneComment = await Comment.findOne({ post: req.params.id });
+
+    if (OneComment) {
+      // Bổ xung xóa Comment liên quan
+      if (permission.type == "admin")
+        CommentDeleteCondition = { post: req.params.id };
+      else CommentDeleteCondition = { post: req.params.id, user: req.userId };
+      const deletedComment = await Comment.deleteMany(CommentDeleteCondition);
+      if (!deletedComment)
+        return res.status(401).json({
+          success: false,
+          message:
+            "Không tìm thấy bình luận liên quan hoặc người dùng không được ủy quyền",
+        });
+    }
 
     res.json({ success: true, user: deletedUser });
   } catch (error) {

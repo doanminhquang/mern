@@ -51,7 +51,6 @@ router.get("/:id", async (req, res) => {
       {
         $project: {
           "user.password": false,
-          "user._id": false,
           "user.email": false,
           "user.createdAt": false,
           "user.__v": false,

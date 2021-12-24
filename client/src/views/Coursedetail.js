@@ -22,16 +22,18 @@ import { formatDate } from "../utils/FormatDate";
 import { getTextDisplay } from "../utils/GettextDisplay";
 //-------------------------------------------------------------
 import { IoLanguageOutline } from "react-icons/io5";
-import { FaChalkboardTeacher } from "react-icons/fa";
 import { AiFillStar } from "react-icons/ai";
-import { BsJournalBookmark } from "react-icons/bs";
-import { BsBookHalf } from "react-icons/bs";
-import { FaEye } from "react-icons/fa";
-import { FaArrowRight } from "react-icons/fa";
-import { FaLock } from "react-icons/fa";
-import { MdKeyboardArrowDown } from "react-icons/md";
-import { MdKeyboardArrowUp } from "react-icons/md";
+import { BsJournalBookmark, BsBookHalf } from "react-icons/bs";
+import {
+  FaChalkboardTeacher,
+  FaEye,
+  FaEyeSlash,
+  FaArrowRight,
+  FaLock,
+} from "react-icons/fa";
+import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { CgMenuBoxed } from "react-icons/cg";
+import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
 //-------------------------------------------------------------
 import { Button } from "react-bootstrap";
 import Spinner from "react-bootstrap/Spinner";
@@ -156,7 +158,7 @@ const Coursedetail = (props) => {
     };
   }, [location]);
 
-  const getContactsById = async () => {
+  const getCmtsById = async (id) => {
     try {
       const response = await axios.get(`${apiUrl}/comments/${id}`);
       if (response.data.success) {
@@ -173,8 +175,7 @@ const Coursedetail = (props) => {
     let componentMounted = true;
     const fetchData = async () => {
       if (componentMounted) {
-        // Get contacts by id
-        getContactsById(id);
+        getCmtsById(id);
       }
     };
     fetchData();
@@ -194,7 +195,6 @@ const Coursedetail = (props) => {
         if (response.data.success)
           if (response.data.students.length !== 0) {
             setreg(false);
-            console.log(response.data.students);
             setindex(response.data.students[0].index);
             setid_std(response.data.students[0]._id);
           } else {
@@ -311,17 +311,17 @@ const Coursedetail = (props) => {
 
   //
 
-  const unregi = async (studentId) => {
+  const unregi = async (couresId) => {
     try {
       const response = await axios.delete(
-        `${apiUrl}/students/unreg/${studentId}`
+        `${apiUrl}/students/unreg/${couresId}`
       );
       if (response.data.success) {
         setreg(true);
         setindex(-1);
         setid_std(0);
-        return response.data;
       }
+      return response.data;
     } catch (error) {
       console.log(error);
     }
@@ -329,7 +329,7 @@ const Coursedetail = (props) => {
 
   const unregpost = async (event) => {
     event.preventDefault();
-    const { success, message } = await unregi(user._id);
+    const { success, message } = await unregi(id);
     setShowToastS({
       showS: true,
       messageS: message,
@@ -401,7 +401,7 @@ const Coursedetail = (props) => {
                   </Button>
                 </a>
               ) : (
-                ""
+                <FaEyeSlash size="24" color="black" />
               )}
             </div>
           </div>
@@ -443,7 +443,7 @@ const Coursedetail = (props) => {
     //}
     if (success) {
       setTimeout(getPosts(), 0);
-      setTimeout(getContactsById(id), 0);
+      setTimeout(getCmtsById(id), 0);
     }
     setShowToastC({
       showC: true,
@@ -1400,7 +1400,12 @@ const Coursedetail = (props) => {
             left: 0,
           }}
         >
-          <Button onClick={() => NextorPrevVideo(idxclick - 1)}>{"<"}</Button>
+          <Button
+            onClick={() => NextorPrevVideo(idxclick - 1)}
+            style={{ padding: 10, borderRadius: "50%" }}
+          >
+            <BiLeftArrow fill="white" />
+          </Button>
         </div>
       )}
       {video !== null && showVideoModal && idxclick < videos.length - 1 && (
@@ -1415,7 +1420,12 @@ const Coursedetail = (props) => {
             right: 0,
           }}
         >
-          <Button onClick={() => NextorPrevVideo(idxclick + 1)}>{">"}</Button>
+          <Button
+            onClick={() => NextorPrevVideo(idxclick + 1)}
+            style={{ padding: 10, borderRadius: "50%" }}
+          >
+            <BiRightArrow fill="white" />
+          </Button>
         </div>
       )}
       {/* add modal */}

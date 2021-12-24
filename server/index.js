@@ -39,9 +39,9 @@ const connectDB = async () => {
 connectDB();
 
 const app = express();
-app.use(express.json({ limit: "50mb", parameterLimit: 50000 }));
+app.use(express.json({ limit: "500mb", parameterLimit: 500000 }));
 app.use(
-  express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 })
+  express.urlencoded({ limit: "500mb", extended: true, parameterLimit: 500000 })
 );
 app.use(
   cors({
@@ -57,6 +57,7 @@ app.use("/api/videos", videoRouter);
 app.use("/api/students", studentRouter);
 app.use("/api/info", infoServerRouter);
 app.use("/api/comments", comment);
+app.use("/filevideo", express.static(__dirname + "/filevideo"));
 
 const PORT = process.env.PORT || 5000;
 

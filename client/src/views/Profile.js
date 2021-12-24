@@ -22,7 +22,7 @@ import Toast from "react-bootstrap/Toast";
 export default function Profile() {
   const {
     authState: {
-      user: { _id, name, avatar, email, username, type },
+      user: { _id, name, avatar, email, username, type, phone },
     },
     loadUser,
   } = useContext(AuthContext);
@@ -48,9 +48,10 @@ export default function Profile() {
     navatar: null,
     npassword: "",
     ntype: type,
+    nphone: phone,
   });
 
-  const { nname, nemail, nusername, navatar, npassword } = newInfo;
+  const { nname, nemail, nusername, navatar, npassword, nphone } = newInfo;
 
   const onChangeNewInfoForm = (event) =>
     setNewInfo({ ...newInfo, [event.target.name]: event.target.value });
@@ -159,6 +160,7 @@ export default function Profile() {
         navatar: avatar,
         npassword: "",
         ntype: type,
+        nphone: phone,
       });
     }
     SetEditMode(!EditMode);
@@ -172,6 +174,7 @@ export default function Profile() {
       navatar: null,
       npassword: "",
       ntype: type,
+      nphone: "",
     });
   };
 
@@ -462,6 +465,7 @@ export default function Profile() {
                                                     item.index,
                                                     item.countvideo
                                                   )}%`,
+                                                  backgroundColor: "#5838fc",
                                                 }}
                                                 aria-valuenow={percent(
                                                   item.index,
@@ -524,6 +528,15 @@ export default function Profile() {
                           value={nusername}
                           onChange={onChangeNewInfoForm}
                           required
+                        />
+                      </div>
+                      <div className="col-md-12">
+                        <input
+                          type="number"
+                          name="nphone"
+                          placeholder="Số điện thoại"
+                          value={nphone}
+                          onChange={onChangeNewInfoForm}
                         />
                       </div>
                       <div className="col-md-12">
