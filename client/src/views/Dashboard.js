@@ -460,6 +460,8 @@ const Dashboard = () => {
               fill="#4d94ff"
               name="Trung bình đánh giá"
             />
+            <Bar dataKey="sumprice" fill="#4d9454" name="Tổng thu nhập" />
+            {/*<Bar dataKey="authorname" fill="#4d94ff" name="Tên tác giả" />*/}
           </BarChart>
           <p>
             <center>

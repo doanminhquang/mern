@@ -689,8 +689,14 @@ const ContactView = () => {
               data={data}
               paging={false}
               info={false}
+              hover={true}
               responsive
               bordered
+              entries={5}
+              displayEntries={false}
+              searchLabel="Tìm kiếm"
+              noRecordsFoundLabel="Chưa có bản ghi nào"
+              paginationLabel={["Trước", "Sau"]}
             />
           ) : (
             ""

@@ -8,9 +8,8 @@ import author from "../assets/home/author.png";
 import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
 import { apiUrl } from "../contexts/constants";
-import ItemMyCourse from "../components/posts/ItemMyCourse";
-import { formatDate } from "../utils/FormatDate";
-import { Link } from "react-router-dom";
+import MyPostItem from "../components/layout/MyPostItem";
+import MyEnrollItem from "../components/layout/MyEnrollItem";
 import Spinner from "react-bootstrap/Spinner";
 import { VscEdit } from "react-icons/vsc";
 import Button from "react-bootstrap/Button";
@@ -35,6 +34,7 @@ export default function Profile() {
   const [LoadingPost, setLoadingPost] = useState(true);
   const [LoadingEnroll, setLoadingEnroll] = useState(true);
   const [EditMode, SetEditMode] = useState(false);
+  const [HiddenChangeInfo, setHiddenChangeInfo] = useState(true);
   const [showToast, setShowToast] = useState({
     show: false,
     message: "",
@@ -42,6 +42,7 @@ export default function Profile() {
   });
 
   const [newInfo, setNewInfo] = useState({
+    spassword: "",
     nname: "",
     nemail: "",
     nusername: "",
@@ -49,9 +50,11 @@ export default function Profile() {
     npassword: "",
     ntype: type,
     nphone: phone,
+    flag: true,
   });
 
-  const { nname, nemail, nusername, navatar, npassword, nphone } = newInfo;
+  const { spassword, nname, nemail, nusername, navatar, npassword, nphone } =
+    newInfo;
 
   const onChangeNewInfoForm = (event) =>
     setNewInfo({ ...newInfo, [event.target.name]: event.target.value });
@@ -145,10 +148,6 @@ export default function Profile() {
     };
   }, []);
 
-  const createsreach = (id) => {
-    return "?id=" + id;
-  };
-
   const EditInfo = () => {
     if (EditMode) {
       ClearState();
@@ -161,6 +160,7 @@ export default function Profile() {
         npassword: "",
         ntype: type,
         nphone: phone,
+        flag: true,
       });
     }
     SetEditMode(!EditMode);
@@ -175,7 +175,9 @@ export default function Profile() {
       npassword: "",
       ntype: type,
       nphone: "",
+      flag: true,
     });
+    setHiddenChangeInfo(true);
   };
 
   const uploadFile = async (e) => {
@@ -214,16 +216,20 @@ export default function Profile() {
     event.preventDefault();
     const { success, message } = await UpdateInfo(newInfo);
     if (success) {
-      setTimeout(ClearState(), 0);
-      setTimeout(EditInfo(), 0);
-      setTimeout(loadUser(), 0);
-      setTimeout(getMyPosts(), 0);
+      if (message === "Mật khẩu chính xác") {
+        setHiddenChangeInfo(false);
+        setNewInfo({
+          ...newInfo,
+          flag: false,
+        });
+      } else {
+        setTimeout(ClearState(), 0);
+        setTimeout(EditInfo(), 0);
+        setTimeout(loadUser(), 0);
+        setTimeout(getMyPosts(), 0);
+      }
     }
     setShowToast({ show: true, message, type: success ? "success" : "danger" });
-  };
-
-  const percent = (value1, value2) => {
-    return value1 !== 0 ? Math.round((value1 / value2) * 100) : 0;
   };
 
   return (
@@ -368,26 +374,10 @@ export default function Profile() {
                       >
                         <h3 className="course-title">Khóa học của tôi</h3>
                         <div className="row">
-                          {LoadingPost ? (
-                            <div className="spinner-container">
-                              <Spinner
-                                animation="border"
-                                style={{ color: "#603ce4" }}
-                              />
-                            </div>
-                          ) : MyPost && MyPost.length != 0 ? (
-                            MyPost.map((post) => (
-                              <ItemMyCourse
-                                key={post._id}
-                                post={post}
-                                user={post.user}
-                              />
-                            ))
-                          ) : (
-                            <p style={{ marginLeft: "15px" }}>
-                              Tài khoản chưa có khóa học nào!
-                            </p>
-                          )}
+                          <MyPostItem
+                            LoadingPost={LoadingPost}
+                            MyPost={MyPost}
+                          />
                         </div>
                       </div>
                     ) : (
@@ -396,101 +386,13 @@ export default function Profile() {
                         id="owned"
                         role="tabpanel"
                       >
-                        <div className="tab-content">
-                          <div
-                            className="tab-pane fade show in active"
-                            id="all"
-                            role="tabpanel"
-                          >
-                            {LoadingEnroll ? (
-                              <div className="spinner-container">
-                                <Spinner
-                                  animation="border"
-                                  style={{ color: "#603ce4" }}
-                                />
-                              </div>
-                            ) : (
-                              <table className="result-table">
-                                <thead>
-                                  <tr>
-                                    <th className="course">Tên khóa học</th>
-                                    <th className="date">Ngày đăng ký</th>
-                                    <th>Tiến độ</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {MyEnroll.length != 0 ? (
-                                    MyEnroll.map((item) => (
-                                      <tr key={item.post._id}>
-                                        <td className="course">
-                                          <Link
-                                            to={{
-                                              pathname: "/coursedetail/",
-                                              search: createsreach(
-                                                item.post._id
-                                              ),
-                                            }}
-                                            style={{ color: "black" }}
-                                          >
-                                            {item.post.title}
-                                          </Link>
-                                        </td>
-                                        <td className="date">
-                                          {formatDate(item.createdAt)}
-                                        </td>
-                                        <td>
-                                          <div
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "space-between",
-                                              width: "240px",
-                                            }}
-                                          >
-                                            {percent(
-                                              item.index,
-                                              item.countvideo
-                                            )}
-                                            %
-                                            <div
-                                              className="progress"
-                                              style={{
-                                                width: "75%",
-                                              }}
-                                            >
-                                              <div
-                                                className="progress-bar"
-                                                role="progressbar"
-                                                style={{
-                                                  width: `${percent(
-                                                    item.index,
-                                                    item.countvideo
-                                                  )}%`,
-                                                  backgroundColor: "#5838fc",
-                                                }}
-                                                aria-valuenow={percent(
-                                                  item.index,
-                                                  item.countvideo
-                                                )}
-                                                aria-valuemin={0}
-                                                aria-valuemax={100}
-                                              />
-                                            </div>
-                                          </div>
-                                        </td>
-                                      </tr>
-                                    ))
-                                  ) : (
-                                    <tr>
-                                      <td colSpan="2">
-                                        Chưa đăng ký khóa học nào
-                                      </td>
-                                    </tr>
-                                  )}
-                                </tbody>
-                              </table>
-                            )}
-                          </div>
-                        </div>
+                        <h3 className="course-title">
+                          Khóa học đã đăng ký hoặc mua
+                        </h3>
+                        <MyEnrollItem
+                          LoadingEnroll={LoadingEnroll}
+                          MyEnroll={MyEnroll}
+                        />
                       </div>
                     )}
                   </div>
@@ -500,56 +402,78 @@ export default function Profile() {
                   <div className="contact-form">
                     <h4>Sửa thông tin tài khoản</h4>
                     <form onSubmit={onSubmit} className="row">
-                      <div className="col-md-12">
-                        <input
-                          type="text"
-                          name="nname"
-                          placeholder="Họ và tên"
-                          value={nname}
-                          onChange={onChangeNewInfoForm}
-                          required
-                        />
-                      </div>
-                      <div className="col-md-12">
-                        <input
-                          type="email"
-                          name="nemail"
-                          placeholder="Địa chỉ mail"
-                          value={nemail}
-                          onChange={onChangeNewInfoForm}
-                          required
-                        />
-                      </div>
-                      <div className="col-md-12">
-                        <input
-                          type="text"
-                          name="nusername"
-                          placeholder="Tên tài khoản"
-                          value={nusername}
-                          onChange={onChangeNewInfoForm}
-                          required
-                        />
-                      </div>
-                      <div className="col-md-12">
-                        <input
-                          type="number"
-                          name="nphone"
-                          placeholder="Số điện thoại"
-                          value={nphone}
-                          onChange={onChangeNewInfoForm}
-                        />
-                      </div>
-                      <div className="col-md-12">
-                        <input
-                          type="password"
-                          name="npassword"
-                          placeholder="Mật khẩu"
-                          value={npassword}
-                          onChange={onChangeNewInfoForm}
-                        />
-                      </div>
+                      {HiddenChangeInfo ? (
+                        <div className="col-md-12">
+                          <input
+                            type="password"
+                            name="spassword"
+                            placeholder="Mật khẩu hiện tại"
+                            value={spassword}
+                            onChange={onChangeNewInfoForm}
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <div className="col-md-12">
+                            <input
+                              type="text"
+                              name="nname"
+                              placeholder="Họ và tên"
+                              value={nname}
+                              onChange={onChangeNewInfoForm}
+                              required
+                            />
+                          </div>
+                          <div className="col-md-12">
+                            <input
+                              type="email"
+                              name="nemail"
+                              placeholder="Địa chỉ mail"
+                              value={nemail}
+                              onChange={onChangeNewInfoForm}
+                              required
+                            />
+                          </div>
+                          <div className="col-md-12">
+                            <input
+                              type="text"
+                              name="nusername"
+                              placeholder="Tên tài khoản"
+                              value={nusername}
+                              onChange={onChangeNewInfoForm}
+                              required
+                            />
+                          </div>
+                          <div className="col-md-12">
+                            <input
+                              type="number"
+                              name="nphone"
+                              placeholder="Số điện thoại"
+                              value={nphone}
+                              onChange={onChangeNewInfoForm}
+                            />
+                          </div>
+                          <div className="col-md-12">
+                            <input
+                              type="password"
+                              name="npassword"
+                              placeholder="Mật khẩu"
+                              value={npassword}
+                              onChange={onChangeNewInfoForm}
+                            />
+                          </div>
+                        </>
+                      )}
                       <div className="col-md-6 text-right">
-                        <input type="submit" name="submit" value="Gửi" />
+                        <input
+                          type="submit"
+                          name="submit"
+                          value={
+                            HiddenChangeInfo
+                              ? "Xác thực mật khẩu"
+                              : "Đổi thông tin"
+                          }
+                        />
                       </div>
                     </form>
                   </div>

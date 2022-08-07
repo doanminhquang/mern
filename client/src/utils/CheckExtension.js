@@ -45,3 +45,30 @@ export const isVideo = (file) => {
   }
   return false;
 };
+
+export const isAudio = (file) => {
+  if (file.size > 0) {
+    var ext = getExtension(file.name);
+    switch (ext.toLowerCase()) {
+      case "opus":
+      case "flac":
+      case "webm":
+      case "weba":
+      case "wav":
+      case "ogg":
+      case "m4a":
+      case "mp3":
+      case "oga":
+      case "mid":
+      case "amr":
+      case "aif":
+      case "wma":
+      case "au":
+      case "aac":
+        return true;
+      default:
+        return false;
+    }
+  }
+  return false;
+};

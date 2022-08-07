@@ -4,7 +4,9 @@ import { PostContext } from "../contexts/PostContext";
 import { VideoContext } from "../contexts/VideoContext";
 import { StudentContext } from "../contexts/StudentContext";
 import { CommentContext } from "../contexts/CommentContext";
+import { CategoryContext } from "../contexts/CategoryContext";
 import { AuthContext } from "../contexts/AuthContext";
+import { QuestionContext } from "../contexts/QuestionContext";
 //---------------------------------------------------
 import Spinner from "react-bootstrap/Spinner";
 import Button from "react-bootstrap/Button";
@@ -19,7 +21,7 @@ import ActionButtons from "../components/posts/ActionButtons";
 import { MDBDataTable } from "mdbreact";
 import BeVietNamProFont from "../utils/BeVietNamPro";
 import { formatDate } from "../utils/FormatDate";
-import { getTextDisplay } from "../utils/GettextDisplay";
+import { getCurrencyVnd } from "../utils/GettextDisplay";
 //---------------------------------------------------
 import { FaFileCsv } from "react-icons/fa";
 import { FaFileExcel } from "react-icons/fa";
@@ -63,6 +65,16 @@ const CoursesD = () => {
     commentState: { commentLoading },
     getComments,
   } = useContext(CommentContext);
+
+  const {
+    categoryState: { categorysLoading },
+    getCategorys,
+  } = useContext(CategoryContext);
+
+  const {
+    questionState: { questionsLoading },
+    getAllQuestion,
+  } = useContext(QuestionContext);
 
   // Start: Get all posts
   useEffect(() => {
@@ -120,6 +132,34 @@ const CoursesD = () => {
     };
   }, []);
 
+  // Start: Get all category
+  useEffect(() => {
+    let componentMounted = true;
+    const fetchData = async () => {
+      if (componentMounted) {
+        getCategorys();
+      }
+    };
+    fetchData();
+    return () => {
+      componentMounted = false;
+    };
+  }, []);
+
+  // Start: Get all questions
+  useEffect(() => {
+    let componentMounted = true;
+    const fetchData = async () => {
+      if (componentMounted) {
+        getAllQuestion();
+      }
+    };
+    fetchData();
+    return () => {
+      componentMounted = false;
+    };
+  }, []);
+
   const removeHTML = (str) => {
     var tmp = document.createElement("DIV");
     tmp.innerHTML = str;
@@ -132,9 +172,11 @@ const CoursesD = () => {
       ? posts.map((post) => {
           return {
             "Tiêu đề": post.title,
-            "Loại khóa học": getTextDisplay(post.coursetype),
+            "Loại khóa học": post.category && post.category.name,
             "Tác giả": post.user.name + " - " + post.user.username,
             "Mô tả": removeHTML(post.description),
+            Giá: getCurrencyVnd(post.price),
+            "Tổng thu nhập": getCurrencyVnd(post.sumprice),
             "Thời gian": formatDate(post.createdAt),
           };
         })
@@ -164,6 +206,8 @@ const CoursesD = () => {
     getAllVideo();
     getStudents();
     getComments();
+    getCategorys();
+    getAllQuestion();
   };
 
   /// pdf
@@ -181,14 +225,24 @@ const CoursesD = () => {
       "Dữ Liệu Khóa Học - "
     );
     const headers = [
-      ["Tiêu đề", "Loại khóa học", "Tác giả", "Mô tả", "Thời gian"],
+      [
+        "Tiêu đề",
+        "Loại khóa học",
+        "Tác giả",
+        "Mô tả",
+        "Giá",
+        "Tổng thu nhập",
+        "Thời gian",
+      ],
     ];
     let data = posts
       ? posts.map((post) => [
           post.title,
-          getTextDisplay(post.coursetype),
+          post.category.name,
           post.user.name + " - " + post.user.username,
           removeHTML(post.description),
+          getCurrencyVnd(post.price),
+          getCurrencyVnd(post.sumprice),
           formatDate(post.createdAt),
         ])
       : "";
@@ -221,6 +275,8 @@ const CoursesD = () => {
         },
         3: {},
         4: {},
+        5: {},
+        6: {},
       },
     };
     var pageHeight =
@@ -250,7 +306,7 @@ const CoursesD = () => {
       ? posts.map((post) => {
           return {
             tilte: post.title,
-            coursetype: getTextDisplay(post.coursetype),
+            coursetype: post.category && post.category.name,
             username: post.user.name + " - " + post.user.username,
             description: (
               <div
@@ -266,6 +322,8 @@ const CoursesD = () => {
                 {removeHTML(post.description)}
               </div>
             ),
+            price: getCurrencyVnd(post.price),
+            sumprice: getCurrencyVnd(post.sumprice),
             createdAt: formatDate(post.createdAt),
             action: <ActionButtons _id={post._id} />,
           };
@@ -281,7 +339,7 @@ const CoursesD = () => {
         field: "tilte",
         sort: "asc",
         attributes: {
-          width: "22%",
+          width: "20%",
         },
       },
       {
@@ -297,7 +355,7 @@ const CoursesD = () => {
         field: "username",
         sort: "asc",
         attributes: {
-          width: "13%",
+          width: "10%",
         },
       },
       {
@@ -305,7 +363,23 @@ const CoursesD = () => {
         field: "description",
         sort: "asc",
         attributes: {
-          width: "32%",
+          width: "18%",
+        },
+      },
+      {
+        label: "Giá",
+        field: "price",
+        sort: "asc",
+        attributes: {
+          width: "5%",
+        },
+      },
+      {
+        label: "Tổng thu nhập",
+        field: "sumprice",
+        sort: "asc",
+        attributes: {
+          width: "5%",
         },
       },
       {
@@ -330,7 +404,14 @@ const CoursesD = () => {
 
   let body = null;
 
-  if (postsLoading || videosLoading || studentsLoading || commentLoading) {
+  if (
+    postsLoading ||
+    videosLoading ||
+    studentsLoading ||
+    commentLoading ||
+    categorysLoading ||
+    questionsLoading
+  ) {
     body = (
       <div className="spinner-container">
         <Spinner animation="border" style={{ color: "#603ce4" }} />
@@ -343,25 +424,27 @@ const CoursesD = () => {
           <Card.Header as="h1">Chào {name}</Card.Header>
           <Card.Body>
             <Card.Text>Click nút để thêm khóa học</Card.Text>
-            <Button
-              style={{ background: "#603ce4", border: "none" }}
-              onClick={setShowAddPostModal.bind(this, true)}
-            >
-              Thêm ngay
-            </Button>
-            <Button
-              title="Làm mới dữ liệu"
-              style={{
-                marginLeft: "10px",
-                background: "#603ce4",
-                border: "none",
-              }}
-              onClick={() => {
-                FuncRefresh();
-              }}
-            >
-              <HiRefresh />
-            </Button>
+            <center>
+              <Button
+                style={{ background: "#603ce4", border: "none" }}
+                onClick={setShowAddPostModal.bind(this, true)}
+              >
+                Thêm ngay
+              </Button>
+              <Button
+                title="Làm mới dữ liệu"
+                style={{
+                  marginLeft: "10px",
+                  background: "#603ce4",
+                  border: "none",
+                }}
+                onClick={() => {
+                  FuncRefresh();
+                }}
+              >
+                <HiRefresh />
+              </Button>
+            </center>
           </Card.Body>
         </Card>
       </>
@@ -464,8 +547,14 @@ const CoursesD = () => {
               data={data}
               paging={false}
               info={false}
+              hover={true}
               responsive
               bordered
+              entries={5}
+              displayEntries={false}
+              searchLabel="Tìm kiếm"
+              noRecordsFoundLabel="Chưa có bản ghi nào"
+              paginationLabel={["Trước", "Sau"]}
             />
           ) : (
             ""

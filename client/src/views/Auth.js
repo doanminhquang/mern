@@ -20,8 +20,17 @@ const Auth = ({ authRoute }) => {
         <Spinner animation="border" style={{ color: "#603ce4" }} />
       </div>
     );
-  else if (isAuthenticated) return <Redirect to="/dashboard" />;
-  else
+  else if (isAuthenticated) {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    let value = params.NEXT;
+    if (value === null) {
+      return <Redirect to="/dashboard" />;
+    } else {
+      return <Redirect to={value} />;
+    }
+  } else
     body = (
       <>
         {authRoute === "login" && <LoginForm />}

@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { UserContext } from "../contexts/UserContext";
+import { CategoryContext } from "../contexts/CategoryContext";
 import { AuthContext } from "../contexts/AuthContext";
 //--------------------------------------------------
 import Spinner from "react-bootstrap/Spinner";
@@ -7,9 +7,9 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Toast from "react-bootstrap/Toast";
 //--------------------------------------------------
-import Register from "../components/users/RegisterForm";
-import UpdateUserModal from "../components/users/UpdateUserModal";
-import ActionButtons from "../components/users/ActionButtons";
+import AddCategoryModal from "../components/categorys/AddCategoryModal";
+import UpdateCategoryModal from "../components/categorys/UpdateCategoryModal";
+import ActionButtons from "../components/categorys/ActionButtons";
 //--------------------------------------------------
 import { MDBDataTable } from "mdbreact";
 import { CSVLink } from "react-csv";
@@ -22,11 +22,9 @@ import { FaFileExcel } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa";
 import { HiRefresh } from "react-icons/hi";
 //--------------------------------------------------
-import { formatDate } from "../utils/FormatDate";
 import BeVietNamProFont from "../utils/BeVietNamPro";
-import { getTextDisplayUserType } from "../utils/GettextDisplay";
 
-const Account = () => {
+const Category = () => {
   // Contexts
   const {
     authState: {
@@ -35,20 +33,20 @@ const Account = () => {
   } = useContext(AuthContext);
 
   const {
-    userState: { user, users, usersLoading },
-    getUsers,
-    setShowAddUserModal,
-    showUpdateUserModal,
+    categoryState: { category, categorys, categorysLoading },
+    getCategorys,
+    setShowAddCategoryModal,
+    showUpdateCategoryModal,
     showToast: { show, message, type },
     setShowToast,
-  } = useContext(UserContext);
+  } = useContext(CategoryContext);
 
-  // Start: Get all users
+  // Start: Get all Categorys
   useEffect(() => {
     let componentMounted = true;
     const fetchData = async () => {
       if (componentMounted) {
-        getUsers();
+        getCategorys();
       }
     };
     fetchData();
@@ -59,18 +57,14 @@ const Account = () => {
 
   // create data
   const createdata = () => {
-    let Users = users
-      ? users.map((user) => {
+    let Categorys = categorys
+      ? categorys.map((category) => {
           return {
-            "Tên người dùng": user.name,
-            "Tên tài khoản": user.username,
-            "Địa chỉ mail": user.email,
-            "Loại tài khoản": getTextDisplayUserType(user.type),
-            "Thời gian": formatDate(user.createdAt),
+            "Thể loại": category.name,
           };
         })
       : "";
-    return Users;
+    return Categorys;
   };
 
   // csv
@@ -101,27 +95,11 @@ const Account = () => {
     doc.addFont("BeVietNamProFont.ttf", "BeVietNamProFont", "normal");
     doc.setFont("BeVietNamProFont");
     const title = createNamefile().replace(
-      "DL_Tai_Khoan_",
-      "Dữ Liệu Tài Khoản - "
+      "DL_The_Loai_",
+      "Dữ Liệu Thể Loại - "
     );
-    const headers = [
-      [
-        "Tên người dùng",
-        "Tên tài khoản",
-        "Địa chỉ mail",
-        "Loại tài khoản",
-        "Thời gian",
-      ],
-    ];
-    let data = users
-      ? users.map((user) => [
-          user.name,
-          user.username,
-          user.email,
-          user.type,
-          formatDate(user.createdAt),
-        ])
-      : "";
+    const headers = [["Thể loại"]];
+    let data = categorys ? categorys.map((category) => [category.name]) : "";
     let content = {
       startY: 50,
       head: headers,
@@ -143,14 +121,6 @@ const Account = () => {
       },
       columnStyles: {
         0: {},
-        1: {
-          columnWidth: 100,
-        },
-        2: {
-          columnWidth: 120,
-        },
-        3: {},
-        4: {},
       },
     };
     var pageHeight =
@@ -170,67 +140,31 @@ const Account = () => {
     var mm = String(today.getMonth() + 1).padStart(2, "0");
     var yyyy = today.getFullYear();
     today = mm + "/" + dd + "/" + yyyy;
-    return "DL_Tai_Khoan_" + today;
+    return "DL_The_Loai_" + today;
   };
 
   // data table
 
   const assemblePosts = () => {
-    let Users = users
-      ? users.map((user) => {
+    let Categorys = categorys
+      ? categorys.map((category) => {
           return {
-            name: user.name,
-            username: user.username,
-            email: user.email,
-            type: getTextDisplayUserType(user.type),
-            createdAt: formatDate(user.createdAt),
-            action: <ActionButtons _id={user._id} />,
+            name: category.name,
+            action: <ActionButtons _id={category._id} />,
           };
         })
       : "";
-    return Users;
+    return Categorys;
   };
 
   const data = {
     columns: [
       {
-        label: "Tên người dùng",
+        label: "Thể loại",
         field: "name",
         sort: "asc",
         attributes: {
-          width: "15%",
-        },
-      },
-      {
-        label: "Tên tài khoản",
-        field: "username",
-        sort: "asc",
-        attributes: {
-          width: "15%",
-        },
-      },
-      {
-        label: "Địa chỉ mail",
-        field: "email",
-        sort: "asc",
-        attributes: {
-          width: "15%",
-        },
-      },
-      {
-        label: "Loại tài khoản",
-        field: "type",
-        sort: "asc",
-        attributes: {
-          width: "15%",
-        },
-      },
-      {
-        label: "Thời gian",
-        field: "createdAt",
-        sort: "asc",
-        attributes: {
-          width: "10%",
+          width: "85%",
         },
       },
       {
@@ -238,7 +172,7 @@ const Account = () => {
         field: "action",
         sort: "asc",
         attributes: {
-          width: "10%",
+          width: "15%",
         },
       },
     ],
@@ -246,27 +180,38 @@ const Account = () => {
   };
 
   const FuncRefresh = () => {
-    getUsers();
+    getCategorys();
   };
 
   let body = null;
 
-  if (usersLoading) {
+  if (categorysLoading) {
     body = (
       <div className="spinner-container">
         <Spinner animation="border" style={{ color: "#603ce4" }} />
       </div>
     );
-  } else if (users && users.length === 0) {
+  } else if (categorys && categorys.length === 0) {
     body = (
       <>
         <Card className="text-center mx-5 my-5">
           <Card.Header as="h1">Chào {name}</Card.Header>
           <Card.Body>
             <Card.Text>
-              Chưa có tài khoản nào được tìm thấy, vui lòng thử lại
+              Chưa có thể loại nào được tìm thấy, vui lòng thêm dữ liệu
             </Card.Text>
             <center>
+              <Button
+                style={{
+                  background: "#603ce4",
+                  border: "none",
+                  marginRight: "10px",
+                  padding: 10,
+                }}
+                onClick={setShowAddCategoryModal.bind(this, true)}
+              >
+                Thêm ngay
+              </Button>
               <Button
                 title="Làm mới dữ liệu"
                 style={{
@@ -363,7 +308,7 @@ const Account = () => {
                 marginRight: "10px",
                 padding: 10,
               }}
-              onClick={setShowAddUserModal.bind(this, true)}
+              onClick={setShowAddCategoryModal.bind(this, true)}
             >
               Thêm ngay
             </Button>
@@ -410,9 +355,9 @@ const Account = () => {
       }}
     >
       {body}
-      <Register />
-      {user !== null && showUpdateUserModal && <UpdateUserModal />}
-      {/* After user is added, show toast */}
+      <AddCategoryModal />
+      {category !== null && showUpdateCategoryModal && <UpdateCategoryModal />}
+      {/* After category is added, show toast */}
       <Toast
         show={show}
         style={{ position: "fixed", top: "20%", right: "10px" }}
@@ -433,4 +378,4 @@ const Account = () => {
   );
 };
 
-export default Account;
+export default Category;

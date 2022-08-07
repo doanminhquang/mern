@@ -11,6 +11,7 @@ import Data from "../assets/home/data-image.png";
 import Desktop from "../assets/home/desktop1-image.png";
 //-----------------------------------------------------------
 import { PostContext } from "../contexts/PostContext";
+import { CategoryContext } from "../contexts/CategoryContext";
 //-----------------------------------------------------------
 import Spinner from "react-bootstrap/Spinner";
 //-----------------------------------------------------------
@@ -26,16 +27,14 @@ const Home = () => {
     getPosts,
   } = useContext(PostContext);
 
+  const {
+    categoryState: { categorys },
+    getCategorys,
+  } = useContext(CategoryContext);
+
   const [SreachString, setSreachString] = useState(null);
 
   const [type, setType] = useState("All");
-  const [isActive1, setActive1] = useState(true);
-  const [isActive2, setActive2] = useState(false);
-  const [isActive3, setActive3] = useState(false);
-  const [isActive4, setActive4] = useState(false);
-  const [isActive5, setActive5] = useState(false);
-  const [isActive6, setActive6] = useState(false);
-  const [isActive7, setActive7] = useState(false);
 
   let count = 0;
 
@@ -45,6 +44,20 @@ const Home = () => {
     const fetchData = async () => {
       if (componentMounted) {
         getPosts();
+      }
+    };
+    fetchData();
+    return () => {
+      componentMounted = false;
+    };
+  }, []);
+
+  // Start: Get all category
+  useEffect(() => {
+    let componentMounted = true;
+    const fetchData = async () => {
+      if (componentMounted) {
+        getCategorys();
       }
     };
     fetchData();
@@ -87,11 +100,11 @@ const Home = () => {
               SreachString &&
               post.title.toLowerCase().search(SreachString.toLowerCase()) !== -1
             ? renderCard(post, posts)
-            : type !== "All" && !SreachString && post.coursetype === type
+            : type !== "All" && !SreachString && post.category.name === type
             ? renderCard(post, posts)
             : type !== "All" &&
               SreachString &&
-              post.coursetype === type &&
+              post.category.name === type &&
               post.title.toLowerCase().search(SreachString.toLowerCase()) !== -1
             ? renderCard(post, posts)
             : incCount()
@@ -117,46 +130,7 @@ const Home = () => {
 
   const click = (e) => {
     const value = e.target.getAttribute("data-group");
-    setActive1(false);
-    setActive2(false);
-    setActive3(false);
-    setActive4(false);
-    setActive5(false);
-    setActive6(false);
-    setActive7(false);
-    switch (value) {
-      case "All":
-        setType("All");
-        setActive1(true);
-        break;
-      case "Data Science":
-        setType("Data Science");
-        setActive2(true);
-        break;
-      case "Computer Science":
-        setType("Computer Science");
-        setActive3(true);
-        break;
-      case "Web Development":
-        setType("Web Development");
-        setActive4(true);
-        break;
-      case "Mobile Development":
-        setType("Mobile Development");
-        setActive5(true);
-        break;
-      case "Application Development":
-        setType("Application Development");
-        setActive6(true);
-        break;
-      case "Other":
-        setType("Other");
-        setActive7(true);
-        break;
-      default:
-        setType("All");
-        setActive1(true);
-    }
+    setType(value);
   };
 
   const onChangeSreach = (event) => setSreachString(event.target.value);
@@ -282,54 +256,21 @@ const Home = () => {
               </form>
               <ul className="shaf-filter">
                 <li
-                  className={isActive1 ? "active" : null}
+                  className={type === "All" ? "active" : null}
                   data-group="All"
                   onClick={(e) => click(e)}
                 >
                   Tất cả
                 </li>
-                <li
-                  className={isActive2 ? "active" : null}
-                  data-group="Data Science"
-                  onClick={(e) => click(e)}
-                >
-                  Khoa học dữ liệu
-                </li>
-                <li
-                  className={isActive3 ? "active" : null}
-                  data-group="Computer Science"
-                  onClick={(e) => click(e)}
-                >
-                  Khoa học máy tính
-                </li>
-                <li
-                  className={isActive4 ? "active" : null}
-                  data-group="Web Development"
-                  onClick={(e) => click(e)}
-                >
-                  Lập trình web
-                </li>
-                <li
-                  className={isActive5 ? "active" : null}
-                  data-group="Mobile Development"
-                  onClick={(e) => click(e)}
-                >
-                  Lập trình mobile
-                </li>
-                <li
-                  className={isActive6 ? "active" : null}
-                  data-group="Application Development"
-                  onClick={(e) => click(e)}
-                >
-                  Lập trình ứng dụng
-                </li>
-                <li
-                  className={isActive7 ? "active" : null}
-                  data-group="Other"
-                  onClick={(e) => click(e)}
-                >
-                  Khác
-                </li>
+                {categorys.map((option) => (
+                  <li
+                    className={type === option.name ? "active" : null}
+                    data-group={option.name}
+                    onClick={(e) => click(e)}
+                  >
+                    {option.name}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { VideoContext } from "../contexts/VideoContext";
 import { StudentContext } from "../contexts/StudentContext";
 import { CommentContext } from "../contexts/CommentContext";
 import { AuthContext } from "../contexts/AuthContext";
+import { QuestionContext } from "../contexts/QuestionContext";
 import { apiUrl } from "../contexts/constants";
 //-------------------------------------------------------------
 import Navbar from "../components/layout/NavbarHome";
@@ -14,12 +15,12 @@ import Preload from "../components/layout/PreLoad";
 import ItemCourse from "../components/posts/ItemCourse";
 import ShowVideoModal from "../components/videos/ShowVideoModal";
 import Star from "../components/layout/Star";
+import CardQuestion from "../components/questions/CardQuestion";
 //-------------------------------------------------------------
 import Banner from "../assets/banner.jpg";
 import author from "../assets/home/author.png";
 import { Markup } from "interweave";
 import { formatDate } from "../utils/FormatDate";
-import { getTextDisplay } from "../utils/GettextDisplay";
 //-------------------------------------------------------------
 import { IoLanguageOutline } from "react-icons/io5";
 import { AiFillStar } from "react-icons/ai";
@@ -31,7 +32,12 @@ import {
   FaArrowRight,
   FaLock,
 } from "react-icons/fa";
-import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import { RiQuestionnaireLine } from "react-icons/ri";
+import {
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+  MdOutlinePriceChange,
+} from "react-icons/md";
 import { CgMenuBoxed } from "react-icons/cg";
 import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
 //-------------------------------------------------------------
@@ -59,8 +65,8 @@ const Coursedetail = (props) => {
   const [id_std, setid_std] = useState(0);
   const [tab, settab] = useState(0);
   const [showvideo, setshowvideo] = useState(false);
-  const [listcmt, setListcmt] = useState([]);
-  const [listcmtdetail, setListcmtdetail] = useState([]);
+  const [listcmt, setListcmt] = useState();
+  const [listcmtdetail, setListcmtdetail] = useState();
   const location = useLocation();
 
   var url = window.location.href;
@@ -120,6 +126,13 @@ const Coursedetail = (props) => {
     addComment,
   } = useContext(CommentContext);
 
+  const {
+    questionState: { questions, questionsLoading },
+    getQuestions,
+    showToastQ: { showQ, messageQ, typeQ },
+    setShowToastQ,
+  } = useContext(QuestionContext);
+
   const RessetData = () => {
     setData(null);
     setTextSreach(null);
@@ -150,6 +163,20 @@ const Coursedetail = (props) => {
     const fetchData = async () => {
       if (componentMounted) {
         getVideos(id);
+      }
+    };
+    fetchData();
+    return () => {
+      componentMounted = false;
+    };
+  }, [location]);
+
+  // Start: Get all question by id
+  useEffect(() => {
+    let componentMounted = true;
+    const fetchData = async () => {
+      if (componentMounted) {
+        getQuestions(id);
       }
     };
     fetchData();
@@ -226,6 +253,19 @@ const Coursedetail = (props) => {
     let componentMounted = true;
     const fetchData = async () => {
       if (componentMounted) {
+        check();
+      }
+    };
+    fetchData();
+    return () => {
+      componentMounted = false;
+    };
+  });
+
+  useEffect(() => {
+    let componentMounted = true;
+    const fetchData = async () => {
+      if (componentMounted) {
         setNewContact({
           ...newContact,
           subject: "[Đăng ký khóa học] " + thistitle + " - " + id,
@@ -282,14 +322,18 @@ const Coursedetail = (props) => {
   const regp = async (newStudent) => {
     try {
       const response = await axios.post(`${apiUrl}/students/`, newStudent);
-      if (response.data.success) {
-        setreg(false);
-        setindex(response.data.student.index);
-        setid_std(response.data.student._id);
+      if (response.data?.success) {
+        if (!response.data?.url) {
+          setreg(false);
+          setindex(response.data.student.index);
+          setid_std(response.data.student._id);
+        } else {
+          window.location.href = response.data?.url;
+        }
         return response.data;
       }
     } catch (error) {
-      return error.response.data
+      return error.response?.data
         ? error.response.data
         : { success: false, message: "Máy chủ lỗi" };
     }
@@ -316,12 +360,12 @@ const Coursedetail = (props) => {
       const response = await axios.delete(
         `${apiUrl}/students/unreg/${couresId}`
       );
-      if (response.data.success) {
+      if (response.data?.success) {
         setreg(true);
         setindex(-1);
         setid_std(0);
       }
-      return response.data;
+      return response?.data;
     } catch (error) {
       console.log(error);
     }
@@ -416,6 +460,22 @@ const Coursedetail = (props) => {
     countv++;
   };
 
+  const renderQ = (item, i) => {
+    if (questionsLoading) {
+      <div className="spinner-container">
+        <Spinner animation="border" style={{ color: "#603ce4" }} />
+      </div>;
+    } else {
+      return (
+        <>
+          <div className="ci-item with-bg" key={i} style={{ marginBottom: 10 }}>
+            <CardQuestion item={item} />
+          </div>
+        </>
+      );
+    }
+  };
+
   const resetAddPostData = () => {
     setNewContact({
       namecontact: isAuthenticated ? user.name : "",
@@ -494,6 +554,12 @@ const Coursedetail = (props) => {
     return Math.round((countfind / count) * 100);
   };
 
+  let jsxquestion = questions
+    ? questions.map((item, i) => {
+        return renderQ(item, i);
+      })
+    : "";
+
   const renderMain = (post) => {
     thistitle = post.title;
     return (
@@ -523,8 +589,8 @@ const Coursedetail = (props) => {
                   </Link>
                 </div>
                 <div className="categories">
-                  <span>Chủ để:</span>
-                  <p>{getTextDisplay(post.coursetype)}</p>
+                  <span>Chủ đề:</span>
+                  <p>{post.category.name}</p>
                 </div>
                 <div className="ratings">
                   <span style={{ paddingBottom: 6 }}>
@@ -557,36 +623,58 @@ const Coursedetail = (props) => {
                     </a>
                   )}
                 </li>
-                {tab === 1 ? (
-                  <li onClick={() => settab(1)}>
+
+                <li onClick={() => settab(1)}>
+                  {tab === 1 ? (
                     <a data-toggle="tab" className="active">
                       <BsBookHalf />
                       Bài học
                     </a>
-                  </li>
-                ) : (
-                  <li onClick={() => settab(1)}>
+                  ) : (
                     <a data-toggle="tab">
                       <BsBookHalf />
                       Bài học
                     </a>
-                  </li>
-                )}
-                {tab === 2 ? (
-                  <li onClick={() => settab(2)}>
+                  )}
+                </li>
+                <li
+                  onClick={() => {
+                    if (!isAuthenticated || reg) {
+                      setShowToastQ({
+                        showQ: true,
+                        messageQ: "Vui lòng đăng nhập và đăng ký",
+                        typeQ: "danger",
+                      });
+                    } else {
+                      settab(2);
+                    }
+                  }}
+                >
+                  {tab === 2 ? (
+                    <a data-toggle="tab" className="active">
+                      <RiQuestionnaireLine />
+                      Câu hỏi ôn luyện
+                    </a>
+                  ) : (
+                    <a data-toggle="tab">
+                      <RiQuestionnaireLine />
+                      Câu hỏi ôn luyện
+                    </a>
+                  )}
+                </li>
+                <li onClick={() => settab(3)}>
+                  {tab === 3 ? (
                     <a data-toggle="tab" className="active">
                       <AiFillStar />
                       Đánh giá
                     </a>
-                  </li>
-                ) : (
-                  <li onClick={() => settab(2)}>
+                  ) : (
                     <a data-toggle="tab">
                       <AiFillStar />
                       Đánh giá
                     </a>
-                  </li>
-                )}
+                  )}
+                </li>
               </ul>
               <div className="tab-content">
                 {tab === 0 ? (
@@ -677,6 +765,18 @@ const Coursedetail = (props) => {
                   ""
                 )}
                 {tab === 2 ? (
+                  <div
+                    id="questions"
+                    role="tabpanel"
+                    style={{ paddingTop: 25 }}
+                  >
+                    {jsxquestion}
+                  </div>
+                ) : (
+                  ""
+                )}
+
+                {tab === 3 ? (
                   <div id="reviews" role="tabpanel" style={{ paddingTop: 25 }}>
                     <div className="reviw-area">
                       <h4>Đánh giá</h4>
@@ -718,12 +818,13 @@ const Coursedetail = (props) => {
                                   className="progress-bar"
                                   role="progressbar"
                                   style={{
-                                    width: listcmtdetail
-                                      ? `${calc_percent(listcmtdetail, 5)}%`
-                                      : 0,
+                                    width:
+                                      listcmtdetail?.length !== 0
+                                        ? `${calc_percent(listcmtdetail, 5)}%`
+                                        : 0,
                                   }}
                                   aria-valuenow={
-                                    listcmtdetail
+                                    listcmtdetail?.length !== 0
                                       ? calc_percent(listcmtdetail, 5)
                                       : 0
                                   }
@@ -732,7 +833,7 @@ const Coursedetail = (props) => {
                                 />
                               </div>
                               <span>
-                                {listcmtdetail
+                                {listcmtdetail?.length !== 0
                                   ? calc_percent(listcmtdetail, 5)
                                   : 0}
                                 %
@@ -745,12 +846,13 @@ const Coursedetail = (props) => {
                                   className="progress-bar"
                                   role="progressbar"
                                   style={{
-                                    width: listcmtdetail
-                                      ? `${calc_percent(listcmtdetail, 4.5)}%`
-                                      : 0,
+                                    width:
+                                      listcmtdetail?.length !== 0
+                                        ? `${calc_percent(listcmtdetail, 4.5)}%`
+                                        : 0,
                                   }}
                                   aria-valuenow={
-                                    listcmtdetail
+                                    listcmtdetail?.length !== 0
                                       ? calc_percent(listcmtdetail, 4.5)
                                       : 0
                                   }
@@ -759,7 +861,7 @@ const Coursedetail = (props) => {
                                 />
                               </div>
                               <span>
-                                {listcmtdetail
+                                {listcmtdetail?.length !== 0
                                   ? calc_percent(listcmtdetail, 4.5)
                                   : 0}
                                 %
@@ -772,12 +874,13 @@ const Coursedetail = (props) => {
                                   className="progress-bar"
                                   role="progressbar"
                                   style={{
-                                    width: listcmtdetail
-                                      ? `${calc_percent(listcmtdetail, 4)}%`
-                                      : 0,
+                                    width:
+                                      listcmtdetail?.length !== 0
+                                        ? `${calc_percent(listcmtdetail, 4)}%`
+                                        : 0,
                                   }}
                                   aria-valuenow={
-                                    listcmtdetail
+                                    listcmtdetail?.length !== 0
                                       ? calc_percent(listcmtdetail, 4)
                                       : 0
                                   }
@@ -786,7 +889,7 @@ const Coursedetail = (props) => {
                                 />
                               </div>
                               <span>
-                                {listcmtdetail
+                                {listcmtdetail?.length !== 0
                                   ? calc_percent(listcmtdetail, 4)
                                   : 0}
                                 %
@@ -799,12 +902,13 @@ const Coursedetail = (props) => {
                                   className="progress-bar"
                                   role="progressbar"
                                   style={{
-                                    width: listcmtdetail
-                                      ? `${calc_percent(listcmtdetail, 3.5)}%`
-                                      : 0,
+                                    width:
+                                      listcmtdetail?.length !== 0
+                                        ? `${calc_percent(listcmtdetail, 3.5)}%`
+                                        : 0,
                                   }}
                                   aria-valuenow={
-                                    listcmtdetail
+                                    listcmtdetail?.length !== 0
                                       ? calc_percent(listcmtdetail, 3.5)
                                       : 0
                                   }
@@ -813,7 +917,7 @@ const Coursedetail = (props) => {
                                 />
                               </div>
                               <span>
-                                {listcmtdetail
+                                {listcmtdetail?.length !== 0
                                   ? calc_percent(listcmtdetail, 3.5)
                                   : 0}
                                 %
@@ -826,12 +930,13 @@ const Coursedetail = (props) => {
                                   className="progress-bar"
                                   role="progressbar"
                                   style={{
-                                    width: listcmtdetail
-                                      ? `${calc_percent(listcmtdetail, 3)}%`
-                                      : 0,
+                                    width:
+                                      listcmtdetail?.length !== 0
+                                        ? `${calc_percent(listcmtdetail, 3)}%`
+                                        : 0,
                                   }}
                                   aria-valuenow={
-                                    listcmtdetail
+                                    listcmtdetail?.length !== 0
                                       ? calc_percent(listcmtdetail, 3)
                                       : 0
                                   }
@@ -840,7 +945,7 @@ const Coursedetail = (props) => {
                                 />
                               </div>
                               <span>
-                                {listcmtdetail
+                                {listcmtdetail?.length !== 0
                                   ? calc_percent(listcmtdetail, 3)
                                   : 0}
                                 %
@@ -853,12 +958,13 @@ const Coursedetail = (props) => {
                                   className="progress-bar"
                                   role="progressbar"
                                   style={{
-                                    width: listcmtdetail
-                                      ? `${calc_percent(listcmtdetail, 2.5)}%`
-                                      : 0,
+                                    width:
+                                      listcmtdetail?.length !== 0
+                                        ? `${calc_percent(listcmtdetail, 2.5)}%`
+                                        : 0,
                                   }}
                                   aria-valuenow={
-                                    listcmtdetail
+                                    listcmtdetail?.length !== 0
                                       ? calc_percent(listcmtdetail, 2.5)
                                       : 0
                                   }
@@ -867,7 +973,7 @@ const Coursedetail = (props) => {
                                 />
                               </div>
                               <span>
-                                {listcmtdetail
+                                {listcmtdetail?.length !== 0
                                   ? calc_percent(listcmtdetail, 2.5)
                                   : 0}
                                 %
@@ -880,12 +986,13 @@ const Coursedetail = (props) => {
                                   className="progress-bar"
                                   role="progressbar"
                                   style={{
-                                    width: listcmtdetail
-                                      ? `${calc_percent(listcmtdetail, 2)}%`
-                                      : 0,
+                                    width:
+                                      listcmtdetail?.length !== 0
+                                        ? `${calc_percent(listcmtdetail, 2)}%`
+                                        : 0,
                                   }}
                                   aria-valuenow={
-                                    listcmtdetail
+                                    listcmtdetail?.length !== 0
                                       ? calc_percent(listcmtdetail, 2)
                                       : 0
                                   }
@@ -894,7 +1001,7 @@ const Coursedetail = (props) => {
                                 />
                               </div>
                               <span>
-                                {listcmtdetail
+                                {listcmtdetail?.length !== 0
                                   ? calc_percent(listcmtdetail, 2)
                                   : 0}
                                 %
@@ -907,12 +1014,13 @@ const Coursedetail = (props) => {
                                   className="progress-bar"
                                   role="progressbar"
                                   style={{
-                                    width: listcmtdetail
-                                      ? `${calc_percent(listcmtdetail, 1.5)}%`
-                                      : 0,
+                                    width:
+                                      listcmtdetail?.length !== 0
+                                        ? `${calc_percent(listcmtdetail, 1.5)}%`
+                                        : 0,
                                   }}
                                   aria-valuenow={
-                                    listcmtdetail
+                                    listcmtdetail?.length !== 0
                                       ? calc_percent(listcmtdetail, 1.5)
                                       : 0
                                   }
@@ -921,7 +1029,7 @@ const Coursedetail = (props) => {
                                 />
                               </div>
                               <span>
-                                {listcmtdetail
+                                {listcmtdetail?.length !== 0
                                   ? calc_percent(listcmtdetail, 1.5)
                                   : 0}
                                 %
@@ -934,12 +1042,13 @@ const Coursedetail = (props) => {
                                   className="progress-bar"
                                   role="progressbar"
                                   style={{
-                                    width: listcmtdetail
-                                      ? `${calc_percent(listcmtdetail, 1)}%`
-                                      : 0,
+                                    width:
+                                      listcmtdetail?.length !== 0
+                                        ? `${calc_percent(listcmtdetail, 1)}%`
+                                        : 0,
                                   }}
                                   aria-valuenow={
-                                    listcmtdetail
+                                    listcmtdetail?.length !== 0
                                       ? calc_percent(listcmtdetail, 1)
                                       : 0
                                   }
@@ -948,7 +1057,7 @@ const Coursedetail = (props) => {
                                 />
                               </div>
                               <span>
-                                {listcmtdetail
+                                {listcmtdetail?.length !== 0
                                   ? calc_percent(listcmtdetail, 1)
                                   : 0}
                                 %
@@ -961,12 +1070,13 @@ const Coursedetail = (props) => {
                                   className="progress-bar"
                                   role="progressbar"
                                   style={{
-                                    width: listcmtdetail
-                                      ? `${calc_percent(listcmtdetail, 0.5)}%`
-                                      : 0,
+                                    width:
+                                      listcmtdetail?.length !== 0
+                                        ? `${calc_percent(listcmtdetail, 0.5)}%`
+                                        : 0,
                                   }}
                                   aria-valuenow={
-                                    listcmtdetail
+                                    listcmtdetail?.length !== 0
                                       ? calc_percent(listcmtdetail, 0.5)
                                       : 0
                                   }
@@ -975,7 +1085,7 @@ const Coursedetail = (props) => {
                                 />
                               </div>
                               <span>
-                                {listcmtdetail
+                                {listcmtdetail?.length !== 0
                                   ? calc_percent(listcmtdetail, 0.5)
                                   : 0}
                                 %
@@ -1278,6 +1388,11 @@ const Coursedetail = (props) => {
                     <IoLanguageOutline />
                     <span>Ngôn ngữ: </span> Tiếng Việt
                   </li>
+                  <li>
+                    <MdOutlinePriceChange />
+                    <span>Giá: </span>{" "}
+                    {post.price !== 0 ? <>{post.price} VNĐ</> : <>Miễn Phí</>}
+                  </li>
                 </ul>
                 {videos.length === 0 ? (
                   <Button
@@ -1559,9 +1674,11 @@ const Coursedetail = (props) => {
       {video !== null && showVideoModal && <ShowVideoModal />}
       {/* After contact is added, show toast */}
       <Toast
-        show={show ? show : showS ? showS : showC}
+        show={show ? show : showS ? showS : showC ? showC : showQ}
         style={{ position: "fixed", top: "20%", right: "10px" }}
-        className={`bg-${show ? type : showS ? typeS : typeC} text-white`}
+        className={`bg-${
+          show ? type : showS ? typeS : showC ? typeC : typeQ
+        } text-white`}
         onClose={
           show
             ? setShowToast.bind(this, {
@@ -1575,17 +1692,25 @@ const Coursedetail = (props) => {
                 messageS: "",
                 typeS: null,
               })
-            : setShowToastC.bind(this, {
+            : showC
+            ? setShowToastC.bind(this, {
                 showC: false,
                 messageC: "",
                 typeC: null,
+              })
+            : setShowToastQ.bind(this, {
+                showQ: false,
+                messageQ: "",
+                typeQ: null,
               })
         }
         delay={3000}
         autohide
       >
         <Toast.Body>
-          <strong>{show ? message : showS ? messageS : messageC}</strong>
+          <strong>
+            {show ? message : showS ? messageS : showC ? messageC : messageQ}
+          </strong>
         </Toast.Body>
       </Toast>
     </>
