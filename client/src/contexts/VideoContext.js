@@ -113,7 +113,7 @@ const VideoContextProvider = ({ children }) => {
         updatedVideo
       );
       if (response.data.success) {
-        dispatch({ type: UPDATE_VIDEO, payload: response.data.contact });
+        dispatch({ type: UPDATE_VIDEO, payload: response.data.video });
         getAllVideo();
         return response.data;
       }

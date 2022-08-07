@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 //-------------------------------------
 import author from "../../assets/home/author.png";
 //-------------------------------------
-import { getTextDisplay } from "../../utils/GettextDisplay";
 import { AiFillTag } from "react-icons/ai";
 import { AiFillStar } from "react-icons/ai";
 //-------------------------------------
+import { getCurrencyVnd } from "../../utils/GettextDisplay";
 
 const checkavatar = (str) => {
   str = str ? str : author;
@@ -17,7 +17,7 @@ const createsreach = (id) => {
 };
 
 const ItemCourse = ({
-  post: { _id, title, coursetype, thumbnail, countrating, avgrating },
+  post: { _id, title, category, thumbnail, countrating, avgrating, price },
   user,
   Posts,
 }) => {
@@ -39,7 +39,7 @@ const ItemCourse = ({
           </Link>
           <div className="fci-details">
             <AiFillTag />
-            {getTextDisplay(coursetype)}
+            {category.name}
             <h4>
               <Link
                 to={{
@@ -64,6 +64,7 @@ const ItemCourse = ({
               </Link>
             </div>
             <div className="price-rate">
+              {getCurrencyVnd(price)}
               <div className="ratings">
                 <AiFillStar color="yellow" />
                 <span>

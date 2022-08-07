@@ -3,10 +3,10 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useContext, useState, useEffect } from "react";
 import { PostContext } from "../../contexts/PostContext";
+import { CategoryContext } from "../../contexts/CategoryContext";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { editorConfiguration } from "../../utils/configCkeditor";
-import { optionselect } from "../../utils/optionselect";
 import { BiImageAdd } from "react-icons/bi";
 import { convertBase64 } from "../../utils/convertBase64";
 import { isImage } from "../../utils/CheckExtension";
@@ -21,12 +21,16 @@ const UpdatePostModal = () => {
     setShowToast,
   } = useContext(PostContext);
 
+  const {
+    categoryState: { categorys },
+  } = useContext(CategoryContext);
+
   // State
   const [updatedPost, setUpdatedPost] = useState(post);
 
   useEffect(() => setUpdatedPost(post), [post]);
 
-  const { title, description, coursetype, thumbnail } = updatedPost;
+  const { title, description, coursetype, thumbnail, price } = updatedPost;
 
   const onChangeUpdatedPostForm = (event) =>
     setUpdatedPost({ ...updatedPost, [event.target.name]: event.target.value });
@@ -84,6 +88,16 @@ const UpdatePostModal = () => {
               Bắt buộc
             </Form.Text>
           </Form.Group>
+          <Form.Group>
+            <Form.Control
+              type="number"
+              placeholder="Giá tiền"
+              name="price"
+              required
+              value={price}
+              onChange={onChangeUpdatedPostForm}
+            />
+          </Form.Group>
           <div style={{ marginBottom: "1rem" }}>
             <CKEditor
               editor={ClassicEditor}
@@ -112,9 +126,10 @@ const UpdatePostModal = () => {
               name="coursetype"
               onChange={onChangeUpdatedPostForm}
             >
-              {optionselect.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.showtext}
+              <option value={null}>Trống</option>
+              {categorys.map((option) => (
+                <option key={option._id} value={option._id}>
+                  {option.name}
                 </option>
               ))}
             </Form.Control>

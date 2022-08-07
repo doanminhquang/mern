@@ -95,9 +95,7 @@ const ViewContactModal = () => {
         </Form.Group>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={closeDialog}>
-          Hủy
-        </Button>
+        <Button onClick={closeDialog}>Hủy</Button>
       </Modal.Footer>
     </Modal>
   );

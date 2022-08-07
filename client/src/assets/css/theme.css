@@ -1020,7 +1020,7 @@ h6 {
 }
 .front p {
   display: inline-block;
-  height: 26px;
+  height: fit-content;
   background: rgba(252, 46, 144, 0.1);
   font-size: 13px;
   line-height: 0.8;
@@ -1029,7 +1029,7 @@ h6 {
   text-align: center;
   border-radius: 3px;
   padding: 7px 11px;
-  margin: 0 0 14px;
+  margin: 0 2px 0 14px;
 }
 .front h4 {
   font-size: 20px;
@@ -1790,7 +1790,7 @@ h6 {
 .course-tab-btn li {
   list-style: none;
   margin: 0;
-  width: 33.33333%;
+  width: 25%;
 }
 .course-tab-btn li a {
   display: inline-block;
@@ -7998,7 +7998,7 @@ ul li {
   margin: 0;
 }
 .fci-details .price-rate .ratings {
-  margin: 7px 0 0;
+  margin: 0;
 }
 .fci-details .ratings span {
   margin-left: 8px;
@@ -8676,6 +8676,7 @@ ul li {
   }
   .hero-content {
     padding: 20px 0 40px;
+    margin-top: 50px;
   }
   .hero-content h2 {
     margin: 0 0 20px;
@@ -9177,4 +9178,66 @@ ul li {
 #rating > label:hover ~ input:checked ~ label,
 #rating > input:checked ~ label:hover ~ label {
   color: #ffed85;
+}
+.posts-per-page {
+  margin-bottom: 15px;
+  width: 100%;
+  border: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.posts-per-page select {
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.posts-per-page:focus {
+  outline: none;
+}
+
+.posts-per-page > *:focus {
+  outline: none;
+}
+
+.pagination-custom {
+  width: 100%;
+  margin-top: 15px;
+}
+
+#page-numbers {
+  list-style: none;
+  display: flex;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#page-numbers > li {
+  color: rgb(62, 140, 204);
+  user-select: none;
+  cursor: pointer;
+  margin: 0 3px;
+  padding: 0 5px;
+  border: 1px solid rgb(62, 140, 204);
+  text-align: center;
+  border-radius: 2px;
+}
+
+#page-numbers > li:not(.active):hover {
+  background: rgb(62, 140, 204);
+  color: white;
+}
+
+#page-numbers > li.active {
+  border-color: #5838fc;
+  color: white;
+  background: #5838fc;
+  cursor: default;
+}
+
+a#basic-nav-dropdown {
+  padding: 0;
 }

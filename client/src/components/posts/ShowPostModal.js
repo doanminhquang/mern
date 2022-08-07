@@ -9,8 +9,11 @@ import { PostContext } from "../../contexts/PostContext";
 import { VideoContext } from "../../contexts/VideoContext";
 import { StudentContext } from "../../contexts/StudentContext";
 import { CommentContext } from "../../contexts/CommentContext";
+import { CategoryContext } from "../../contexts/CategoryContext";
+import { QuestionContext } from "../../contexts/QuestionContext";
 //---------------------------------------------------
 import { FaPhotoVideo } from "react-icons/fa";
+import { FcQuestions } from "react-icons/fc";
 import { FaTimes } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
@@ -18,12 +21,17 @@ import { FaEdit } from "react-icons/fa";
 import AddVideoModal from "../videos/AddVideoModal";
 import UpdateVideoModal from "../videos/UpdateVideoModal";
 import ShowVideoModal from "../videos/ShowVideoModal";
+import AddQuestionModal from "../questions/AddQuestionModal";
+import UpdateQuestionModal from "../questions/UpdateQuestionModal";
+import ShowQuestionModal from "../questions/ShowQuestionModal";
 //---------------------------------------------------
 import { Markup } from "interweave";
-import { optionselect } from "../../utils/optionselect";
 //---------------------------------------------------
 import { Tab, Tabs } from "react-bootstrap";
 import { formatDate } from "../../utils/FormatDate";
+import { getCurrencyVnd } from "../../utils/GettextDisplay";
+//-------------------------------------
+import { Link } from "react-router-dom";
 
 const ViewPostModal = () => {
   // Contexts
@@ -62,11 +70,30 @@ const ViewPostModal = () => {
     deleteComment,
   } = useContext(CommentContext);
 
+  const {
+    categoryState: { categorys },
+  } = useContext(CategoryContext);
+
+  const {
+    questionState: { question, allquestion },
+    showToastQ: { showQ, messageQ, typeQ },
+    setShowToastQ,
+    showQuestionModal,
+    setShowQuestionModal,
+    showAddQuestionModal,
+    setShowAddQuestionModal,
+    showUpdateQuestionModal,
+    setShowUpdateQuestionModal,
+    findQuestionInAll,
+    deleteQuestion,
+  } = useContext(QuestionContext);
+
   // State
   const [showPost, setshowPost] = useState(post);
   const [textSreach, setTextSreach] = useState(null);
   const [textSreachS, setTextSreachS] = useState(null);
   const [textSreachC, setTextSreachC] = useState(null);
+  const [textSreachQ, setTextSreachQ] = useState(null);
   const [key, setKey] = useState("Description");
 
   useEffect(() => setshowPost(post), [post]);
@@ -224,7 +251,8 @@ const ViewPostModal = () => {
           }}
         >
           {formatDate(item.createdAt)} : {item.user.name} -{" "}
-          {percent(item.index)}%
+          {percent(item.index)}% - Giá tại thời điểm đăng kí:{" "}
+          {getCurrencyVnd(item.price)}
         </div>
         <div
           style={{
@@ -303,7 +331,8 @@ const ViewPostModal = () => {
             display: "inline",
           }}
         >
-          {item.user.name} : {item.cmt} : ({item.rating})
+          {item.user.name} đã bình luận: [ {item.cmt} ] Kèm theo đánh giá (
+          {item.rating}) sao
         </div>
         <div
           style={{
@@ -360,6 +389,123 @@ const ViewPostModal = () => {
   }
 
   const onChangeSreachC = (event) => setTextSreachC(event.target.value);
+
+  //--------------------
+
+  let countq = 0;
+  let countQuestion = 0;
+
+  const incCountq = () => {
+    countq++;
+  };
+
+  const incCountQuestion = () => {
+    countQuestion++;
+  };
+
+  const showQuestion = (questionId) => {
+    findQuestionInAll(questionId);
+    setShowQuestionModal(true);
+  };
+
+  const showAddQuestion = (postId) => {
+    findPost(postId);
+    setShowAddQuestionModal(true);
+  };
+
+  const chooseQuestion = (questionId) => {
+    findQuestionInAll(questionId);
+    setShowUpdateQuestionModal(true);
+  };
+
+  const deleteQuestionfnc = async (questionId) => {
+    const { success, message } = await deleteQuestion(questionId);
+    setShowToastQ({
+      showQ: true,
+      messageQ: message ? message : "Xóa thành công",
+      typeQ: success ? "success" : "danger",
+    });
+  };
+
+  const renderQ = (item, i) => {
+    return (
+      <li
+        key={i}
+        style={{
+          height: "39px",
+        }}
+      >
+        <div
+          style={{
+            width: "fit-content",
+            display: "inline",
+          }}
+        >
+          {item.title}
+        </div>
+        <div
+          style={{
+            width: "fit-content",
+            display: "inline",
+            float: "right",
+            marginRight: "10px",
+          }}
+        >
+          <Button
+            title={"Xem " + item.title}
+            style={{
+              background: "transparent",
+              border: 0,
+              padding: 0,
+              paddingRight: 10,
+            }}
+            onClick={showQuestion.bind(this, item._id)}
+          >
+            <FaEye size="24" color="black" />
+          </Button>
+          <Button
+            title={"Sửa " + item.title}
+            style={{
+              background: "transparent",
+              border: 0,
+              padding: 0,
+              paddingRight: 10,
+            }}
+            onClick={chooseQuestion.bind(this, item._id)}
+          >
+            <FaEdit color="green" size="24" />
+          </Button>
+          <Button
+            title={"Xóa câu hỏi " + item.title}
+            style={{ background: "transparent", border: 0, padding: 0 }}
+            onClick={deleteQuestionfnc.bind(this, item._id)}
+          >
+            <FaTimes color="red" size="24" />
+          </Button>
+        </div>
+      </li>
+    );
+  };
+
+  let jsxQuestion = allquestion
+    ? allquestion.map((item, i) => {
+        if (item.post === post._id) {
+          incCountQuestion();
+          return !textSreachQ
+            ? renderQ(item, i)
+            : item.title.toLowerCase().search(textSreachQ.toLowerCase()) !== -1
+            ? renderQ(item, i)
+            : incCountq();
+        }
+      })
+    : "";
+
+  if (countq === countQuestion && countQuestion !== 0) {
+    var str = "Không có bài học '<b>" + textSreachQ + "</b>' mà bạn tìm kiếm";
+    jsxQuestion = <Markup content={str} />;
+  }
+
+  const onChangeSreachQ = (event) => setTextSreachQ(event.target.value);
 
   const jsxtab1 = (
     <>
@@ -534,6 +680,60 @@ const ViewPostModal = () => {
     </>
   );
 
+  const jsxtab5 = (
+    <>
+      <div
+        style={{
+          paddingRight: "10px",
+          height: "44px",
+        }}
+      >
+        <Button
+          title="Thêm câu hỏi"
+          className="post-button"
+          onClick={showAddQuestion.bind(this, post._id)}
+          style={{ marginLeft: "10px" }}
+        >
+          <FcQuestions color="green" size="24" />
+        </Button>
+        <b>Danh sách câu hỏi ({countQuestion} câu):</b>
+        <Form.Group
+          style={{
+            width: "30%",
+            display: "inline",
+            float: "right",
+            margin: 0,
+          }}
+        >
+          <Form.Control
+            type="text"
+            placeholder="Nhập tên câu hỏi..."
+            name="s"
+            value={textSreachQ}
+            onChange={onChangeSreachQ}
+          />
+        </Form.Group>
+      </div>
+      <div
+        style={{
+          height: "fit-content",
+          display: "block",
+          position: "relative",
+          minHeight: "200px",
+          maxHeight: "200px",
+          overflow: "scroll",
+          marginTop: "10px",
+        }}
+      >
+        <ul style={{ listStyle: "decimal-leading-zero" }}>{jsxQuestion}</ul>
+      </div>
+    </>
+  );
+
+  const createsreach = (id) => {
+    return "?id=" + id;
+  };
+
   ////////////////////////////////////
   return (
     <>
@@ -544,7 +744,15 @@ const ViewPostModal = () => {
               width: "100%",
             }}
           >
-            {title}
+            <Link
+              to={{
+                pathname: "/coursedetail/",
+                search: createsreach(post._id),
+              }}
+              style={{ color: "black" }}
+            >
+              {title}
+            </Link>
             <br />
             <small style={{ float: "right", right: 0 }}>
               Đăng tải bởi{" "}
@@ -581,6 +789,9 @@ const ViewPostModal = () => {
                 {jsxtab4}
               </Tab>
             )}
+            <Tab eventKey="Question" title="Câu hỏi ôn tập">
+              {jsxtab5}
+            </Tab>
           </Tabs>
           <Form.Group>
             <Form.Control
@@ -589,9 +800,10 @@ const ViewPostModal = () => {
               disabled={true}
               className="select"
             >
-              {optionselect.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.showtext}
+              <option value={null}>Trống</option>
+              {categorys.map((option) => (
+                <option key={option._id} value={option._id}>
+                  {option.name}
                 </option>
               ))}
             </Form.Control>
@@ -606,16 +818,21 @@ const ViewPostModal = () => {
       {showAddVideoModal && <AddVideoModal />}
       {video !== null && showUpdateVideoModal && <UpdateVideoModal />}
       {video !== null && showVideoModal && <ShowVideoModal />}
+      {showAddQuestionModal && <AddQuestionModal />}
+      {question !== null && showUpdateQuestionModal && <UpdateQuestionModal />}
+      {question !== null && showQuestionModal && <ShowQuestionModal />}
       {/* After video is added, show toast */}
       <Toast
-        show={showV ? showV : showS ? showS : showC}
+        show={showV ? showV : showS ? showS : showC ? showC : showQ}
         style={{
           position: "fixed",
           top: "20%",
           right: "10px",
           zIndex: "9999999999999999999",
         }}
-        className={`bg-${showV ? typeV : showS ? typeS : typeC} text-white`}
+        className={`bg-${
+          showV ? typeV : showS ? typeS : showC ? typeC : typeQ
+        } text-white`}
         onClose={
           showV
             ? setShowToastV.bind(this, {
@@ -629,17 +846,25 @@ const ViewPostModal = () => {
                 messageS: "",
                 typeS: null,
               })
-            : setShowToastC.bind(this, {
+            : showC
+            ? setShowToastC.bind(this, {
                 showC: false,
                 messageC: "",
                 typeC: null,
+              })
+            : setShowToastQ.bind(this, {
+                showQ: false,
+                messageQ: "",
+                typeQ: null,
               })
         }
         delay={3000}
         autohide
       >
         <Toast.Body>
-          <strong>{showV ? messageV : showS ? messageS : messageC}</strong>
+          <strong>
+            {showV ? messageV : showS ? messageS : showC ? messageC : messageQ}
+          </strong>
         </Toast.Body>
       </Toast>
     </>

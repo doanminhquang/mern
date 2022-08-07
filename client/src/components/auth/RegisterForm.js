@@ -15,12 +15,23 @@ const RegisterForm = () => {
     confirmPassword: "",
     name: "",
     phone: "",
+    flag: true,
+    code: "",
+    send: "email",
   });
 
   const [alert, setAlert] = useState(null);
 
-  const { username, email, password, confirmPassword, name, phone } =
-    registerForm;
+  const {
+    username,
+    email,
+    password,
+    confirmPassword,
+    name,
+    phone,
+    code,
+    send,
+  } = registerForm;
 
   const [from, setForm] = useState(0);
 
@@ -42,12 +53,27 @@ const RegisterForm = () => {
     try {
       const registerData = await registerUser(registerForm);
       if (!registerData.success) {
-        setAlert({ type: "danger", message: registerData.message });
-        setTimeout(() => setAlert(null), 5000);
+        if (registerData.message === "Vui lòng nhập mã xác thực") {
+          setRegisterForm({
+            ...registerForm,
+            flag: false,
+          });
+        } else {
+          setAlert({ type: "danger", message: registerData.message });
+          setTimeout(() => setAlert(null), 5000);
+        }
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const ReNewCode = (event) => {
+    event.preventDefault();
+    registerUser({
+      ...registerForm,
+      flag: true,
+    });
   };
 
   const Next = (e) => {
@@ -56,12 +82,20 @@ const RegisterForm = () => {
       setAlert({ type: "danger", message: "Vui lòng nhập đủ thông tin" });
       setTimeout(() => setAlert(null), 5000);
     } else {
+      setRegisterForm({
+        ...registerForm,
+        flag: true,
+      });
       setForm(1);
     }
   };
 
   const Prev = (e) => {
     e.preventDefault();
+    setRegisterForm({
+      ...registerForm,
+      flag: true,
+    });
     setForm(0);
   };
 
@@ -116,48 +150,92 @@ const RegisterForm = () => {
             </>
           ) : (
             <>
-              <div className="form-group">
-                <input
-                  style={{
-                    fontSize: "0.95rem",
-                  }}
-                  type="number"
-                  className="form-control form-control-lg"
-                  placeholder="Số điện thoại"
-                  name="phone"
-                  required
-                  value={phone}
-                  onChange={onChangeRegisterForm}
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  style={{
-                    fontSize: "0.95rem",
-                  }}
-                  type="password"
-                  className="form-control form-control-lg"
-                  placeholder="Mật Khẩu"
-                  name="password"
-                  required
-                  value={password}
-                  onChange={onChangeRegisterForm}
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  style={{
-                    fontSize: "0.95rem",
-                  }}
-                  type="password"
-                  className="form-control form-control-lg"
-                  placeholder="Nhập lại Mật Khẩu"
-                  name="confirmPassword"
-                  required
-                  value={confirmPassword}
-                  onChange={onChangeRegisterForm}
-                />
-              </div>
+              {registerForm.flag ? (
+                <>
+                  <div className="form-group">
+                    <input
+                      style={{
+                        fontSize: "0.95rem",
+                      }}
+                      type="number"
+                      className="form-control form-control-lg"
+                      placeholder="Số điện thoại"
+                      name="phone"
+                      required
+                      value={phone}
+                      onChange={onChangeRegisterForm}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <input
+                      style={{
+                        fontSize: "0.95rem",
+                      }}
+                      type="password"
+                      className="form-control form-control-lg"
+                      placeholder="Mật Khẩu"
+                      name="password"
+                      required
+                      value={password}
+                      onChange={onChangeRegisterForm}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <input
+                      style={{
+                        fontSize: "0.95rem",
+                      }}
+                      type="password"
+                      className="form-control form-control-lg"
+                      placeholder="Nhập lại Mật Khẩu"
+                      name="confirmPassword"
+                      required
+                      value={confirmPassword}
+                      onChange={onChangeRegisterForm}
+                    />
+                  </div>
+                  <div
+                    onChange={onChangeRegisterForm}
+                    style={{
+                      display: "flex",
+                      flexWrap: "nowrap",
+                      alignItems: "center",
+                      alignContent: "center",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      value="email"
+                      name="send"
+                      checked={send === "email"}
+                    />
+                    Email
+                    <input
+                      type="radio"
+                      value="phone"
+                      name="send"
+                      checked={send === "phone"}
+                    />
+                    Điện Thoại
+                  </div>
+                </>
+              ) : (
+                <div className="form-group">
+                  <input
+                    style={{
+                      fontSize: "0.95rem",
+                    }}
+                    type="text"
+                    className="form-control form-control-lg"
+                    placeholder="Nhập mã xác thực"
+                    name="code"
+                    required
+                    value={code}
+                    onChange={onChangeRegisterForm}
+                  />
+                </div>
+              )}
             </>
           )}
           <div className="mt-3">
@@ -189,9 +267,11 @@ const RegisterForm = () => {
                     color: "white",
                     marginRight: 5,
                   }}
-                  onClick={(e) => Prev(e)}
+                  onClick={(e) => {
+                    registerForm.flag ? Prev(e) : ReNewCode(e);
+                  }}
                 >
-                  Quay Lại
+                  {registerForm.flag ? "Quay lại" : "Gửi lại"}
                 </button>
                 <button
                   className="btn font-weight-medium auth-form-btn"
@@ -205,7 +285,7 @@ const RegisterForm = () => {
                     color: "white",
                   }}
                 >
-                  Đăng ký
+                  {registerForm.flag ? "Đăng ký" : "Xác thực mã đăng ký"}
                 </button>
               </>
             )}

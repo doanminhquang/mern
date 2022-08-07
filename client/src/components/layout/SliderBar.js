@@ -7,6 +7,7 @@ import { BsCodeSlash } from "react-icons/bs";
 import { RiContactsFill } from "react-icons/ri";
 import { FaUsers } from "react-icons/fa";
 import { FaTachometerAlt } from "react-icons/fa";
+import { MdOutlineCategory } from "react-icons/md";
 import author from "../../assets/home/author.png";
 
 const SliderBar = () => {
@@ -34,6 +35,9 @@ const SliderBar = () => {
         break;
       case "/dashboard/account":
         setActive(3);
+        break;
+      case "/dashboard/category":
+        setActive(4);
         break;
       default:
         setActive();
@@ -152,30 +156,56 @@ const SliderBar = () => {
             )}
           </li>
           {type === "admin" ? (
-            <li className="nav-item">
-              {active === 3 ? (
-                <Link
-                  className="nav-link"
-                  style={{ color: "#603ce4" }}
-                  to={{
-                    pathname: "/dashboard/account",
-                  }}
-                >
-                  <span className="menu-title">Quản lý tài khoản</span>
-                  <FaUsers color={"#603ce4"} />
-                </Link>
-              ) : (
-                <Link
-                  className="nav-link"
-                  to={{
-                    pathname: "/dashboard/account",
-                  }}
-                >
-                  <span className="menu-title">Quản lý tài khoản</span>
-                  <FaUsers />
-                </Link>
-              )}
-            </li>
+            <>
+              <li className="nav-item">
+                {active === 3 ? (
+                  <Link
+                    className="nav-link"
+                    style={{ color: "#603ce4" }}
+                    to={{
+                      pathname: "/dashboard/account",
+                    }}
+                  >
+                    <span className="menu-title">Quản lý tài khoản</span>
+                    <FaUsers color={"#603ce4"} />
+                  </Link>
+                ) : (
+                  <Link
+                    className="nav-link"
+                    to={{
+                      pathname: "/dashboard/account",
+                    }}
+                  >
+                    <span className="menu-title">Quản lý tài khoản</span>
+                    <FaUsers />
+                  </Link>
+                )}
+              </li>
+              <li className="nav-item">
+                {active === 4 ? (
+                  <Link
+                    className="nav-link"
+                    style={{ color: "#603ce4" }}
+                    to={{
+                      pathname: "/dashboard/category",
+                    }}
+                  >
+                    <span className="menu-title">Quản lý thể loại</span>
+                    <MdOutlineCategory color={"#603ce4"} />
+                  </Link>
+                ) : (
+                  <Link
+                    className="nav-link"
+                    to={{
+                      pathname: "/dashboard/category",
+                    }}
+                  >
+                    <span className="menu-title">Quản lý thể loại</span>
+                    <MdOutlineCategory />
+                  </Link>
+                )}
+              </li>
+            </>
           ) : (
             ""
           )}

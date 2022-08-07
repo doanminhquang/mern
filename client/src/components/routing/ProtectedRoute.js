@@ -8,6 +8,10 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
     authState: { authLoading, isAuthenticated },
   } = useContext(AuthContext);
 
+  const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+  });
+
   if (authLoading)
     return (
       <div className="spinner-container">
@@ -24,7 +28,12 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
             <Component {...rest} {...props} />
           </>
         ) : (
-          <Redirect to="/login" />
+          <Redirect
+            to={{
+              pathname: "/login",
+              search: `?NEXT=${window.location.pathname}?id=${params.id}`,
+            }}
+          />
         )
       }
     />

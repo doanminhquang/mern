@@ -4,9 +4,10 @@ import Card from "react-bootstrap/Card";
 //--------------------------------------------------------
 import author from "../../assets/home/author.png";
 import { formatDate } from "../../utils/FormatDate";
-import { getTextDisplay } from "../../utils/GettextDisplay";
 import Star from "../layout/Star";
+import { MdOutlinePriceChange } from "react-icons/md";
 //-----------------------------------------------------
+import { getCurrencyVnd } from "../../utils/GettextDisplay";
 
 const removeHTML = (str) => {
   var tmp = document.createElement("DIV");
@@ -28,11 +29,12 @@ const CardPost = ({
     _id,
     title,
     description,
-    coursetype,
+    category,
     thumbnail,
     createdAt,
     countrating,
     avgrating,
+    price,
   },
   user,
   Posts,
@@ -48,7 +50,7 @@ const CardPost = ({
               </div>
               <h4>{title}</h4>
               <div className="fcf-bottom">
-                <p>{getTextDisplay(coursetype)}</p>
+                <p>{category.name}</p>
                 <p>{formatDate(createdAt)}</p>
               </div>
             </div>
@@ -68,6 +70,9 @@ const CardPost = ({
                   {title}
                 </Link>
               </h4>
+              <div style={{ color: "white" }}>
+                <MdOutlinePriceChange /> {getCurrencyVnd(price)}
+              </div>
               <div className="ratings">
                 <Star rating={avgrating} />
                 <span style={{ paddingBottom: 6, paddingTop: 10 }}>

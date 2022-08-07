@@ -118,9 +118,7 @@ const UpdateContactModal = () => {
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={closeDialog}>
-            Hủy
-          </Button>
+          <Button onClick={closeDialog}>Hủy</Button>
           <Button
             style={{ background: "#603ce4", border: "none" }}
             type="submit"

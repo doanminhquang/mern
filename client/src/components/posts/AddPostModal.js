@@ -3,10 +3,10 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useContext, useState } from "react";
 import { PostContext } from "../../contexts/PostContext";
+import { CategoryContext } from "../../contexts/CategoryContext";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { editorConfiguration } from "../../utils/configCkeditor";
-import { optionselect } from "../../utils/optionselect";
 import { convertBase64 } from "../../utils/convertBase64";
 import { BiImageAdd } from "react-icons/bi";
 import { isImage } from "../../utils/CheckExtension";
@@ -16,15 +16,20 @@ const AddPostModal = () => {
   const { showAddPostModal, setShowAddPostModal, addPost, setShowToast } =
     useContext(PostContext);
 
+  const {
+    categoryState: { categorys },
+  } = useContext(CategoryContext);
+
   // State
   const [newPost, setNewPost] = useState({
     title: "",
     description: "",
-    coursetype: "Other",
+    coursetype: null,
     thumbnail: "",
+    price: null,
   });
 
-  const { title, description, coursetype, thumbnail } = newPost;
+  const { title, description, coursetype, thumbnail, price } = newPost;
 
   const onChangeNewPostForm = (event) =>
     setNewPost({ ...newPost, [event.target.name]: event.target.value });
@@ -44,8 +49,9 @@ const AddPostModal = () => {
     setNewPost({
       title: "",
       description: "",
-      coursetype: "Other",
+      coursetype: null,
       thumbnail: "",
+      price: null,
     });
     setShowAddPostModal(false);
   };
@@ -91,6 +97,16 @@ const AddPostModal = () => {
               Bắt buộc
             </Form.Text>
           </Form.Group>
+          <Form.Group>
+            <Form.Control
+              type="number"
+              placeholder="Giá tiền"
+              name="price"
+              required
+              value={price}
+              onChange={onChangeNewPostForm}
+            />
+          </Form.Group>
           <div style={{ marginBottom: "1rem" }}>
             <CKEditor
               editor={ClassicEditor}
@@ -117,10 +133,12 @@ const AddPostModal = () => {
               value={coursetype}
               name="coursetype"
               onChange={onChangeNewPostForm}
+              required
             >
-              {optionselect.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.showtext}
+              <option value={null}>Trống</option>
+              {categorys.map((option) => (
+                <option key={option._id} value={option._id}>
+                  {option.name}
                 </option>
               ))}
             </Form.Control>

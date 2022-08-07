@@ -76,7 +76,7 @@ const UserContextProvider = ({ children }) => {
 
   // Find user
   const findUser = (userId) => {
-    const user = userState.users.find((contact) => contact._id === userId);
+    const user = userState.users.find((user) => user._id === userId);
     dispatch({ type: FIND_USER, payload: user });
   };
 

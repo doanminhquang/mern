@@ -34,7 +34,12 @@ const ProtectedRouteAdmin = ({ component: Component, ...rest }) => {
         ) : isAuthenticated ? (
           <Redirect to="/home" />
         ) : (
-          <Redirect to="/login" />
+          <Redirect
+            to={{
+              pathname: "/login",
+              search: `?NEXT=${window.location.pathname}`,
+            }}
+          />
         )
       }
     />

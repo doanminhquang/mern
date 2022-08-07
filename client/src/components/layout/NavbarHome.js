@@ -28,7 +28,12 @@ export default function Navbar() {
   const logout = () => logoutUser();
 
   const [LogoMode, SetLogoMode] = useState(true);
+
   const path = window.location.pathname;
+
+  const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+  });
 
   useEffect(() => {
     $(window).on("scroll", function () {
@@ -50,6 +55,15 @@ export default function Navbar() {
       SetLogoMode(false);
     }
   }, [path]);
+
+  const CollapseNavBar = () => {
+    const collapse_nav_bar = document.querySelector("#collapse_nav_bar");
+    if (collapse_nav_bar.classList.contains("collapse")) {
+      collapse_nav_bar.classList.remove("collapse");
+    } else {
+      collapse_nav_bar.classList.add("collapse");
+    }
+  };
 
   const checkavatar = (str) => {
     str = str ? str : author;
@@ -85,10 +99,14 @@ export default function Navbar() {
                     alt="QLMS_Logo"
                   />
                 </Link>
-                <button className="navbar-toggler" type="button">
+                <button
+                  className="navbar-toggler"
+                  type="button"
+                  onClick={() => CollapseNavBar()}
+                >
                   <FaBars />
                 </button>
-                <div className="collapse navbar-collapse">
+                <div id="collapse_nav_bar" className="collapse navbar-collapse">
                   <ul className="navbar-nav">
                     <li className="menu-item-has-children">
                       <Link
@@ -117,6 +135,28 @@ export default function Navbar() {
                         Liên hệ
                       </Link>
                     </li>
+                    <li>
+                      <Link
+                        to={{
+                          pathname: "/liveeditor",
+                        }}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        L.Editor
+                      </Link>
+                    </li>{" "}
+                    <li>
+                      <Link
+                        to={{
+                          pathname: "/compile",
+                        }}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Compile
+                      </Link>
+                    </li>
                   </ul>
                 </div>
                 {isAuthenticated === false ? (
@@ -125,6 +165,10 @@ export default function Navbar() {
                       className="user-btn"
                       to={{
                         pathname: "/login",
+                        search:
+                          params.id !== null
+                            ? `?NEXT=${path}?id=${params.id}`
+                            : `?NEXT=${path}`,
                       }}
                     >
                       <FaUser size="17" style={{ marginTop: "-6px" }} />
@@ -192,7 +236,10 @@ export default function Navbar() {
                         )}
                       </NavDropdown.Item>
                       <NavDropdown.Divider />
-                      <NavDropdown.Item onClick={logout}>
+                      <NavDropdown.Item
+                        onClick={logout}
+                        style={{ color: "black" }}
+                      >
                         <FaSignOutAlt size="20" /> Đăng xuất
                       </NavDropdown.Item>
                     </NavDropdown>
