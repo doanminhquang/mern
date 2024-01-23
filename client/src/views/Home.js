@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 //-----------------------------------------------------------
 import { FaArrowRight } from "react-icons/fa";
 //-----------------------------------------------------------
+import ChatPopup from "../components/chat/ChatPopupComponent";
 
 const Home = () => {
   // Contexts
@@ -279,6 +280,7 @@ const Home = () => {
           </div>
         </div>
       </section>
+      <ChatPopup />
       <Footer />
     </>
   );

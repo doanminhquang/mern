@@ -221,20 +221,19 @@ export default function Navbar() {
                           <CgProfile size="20" /> Trang cá nhân
                         </Link>
                       </NavDropdown.Item>
-                      <NavDropdown.Item>
-                        {user !== null && user.type === "admin" ? (
-                          <Link
-                            style={{ color: "black" }}
-                            to={{
-                              pathname: "/dashboard",
-                            }}
-                          >
-                            <MdDashboard size="20" /> Quản lý hệ thống
-                          </Link>
-                        ) : (
-                          ""
+                      {user !== null &&
+                        (user.type === "admin" || user.type === "ctv") && (
+                          <NavDropdown.Item>
+                            <Link
+                              style={{ color: "black" }}
+                              to={{
+                                pathname: "/dashboard",
+                              }}
+                            >
+                              <MdDashboard size="20" /> Quản lý hệ thống
+                            </Link>
+                          </NavDropdown.Item>
                         )}
-                      </NavDropdown.Item>
                       <NavDropdown.Divider />
                       <NavDropdown.Item
                         onClick={logout}

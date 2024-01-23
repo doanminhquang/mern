@@ -8,6 +8,9 @@ const User = require("../models/User");
 const Post_Detail = require("../models/Post_Detail");
 const Student = require("../models/Students");
 const Comment = require("../models/Comments");
+const Question = require("../models/Question");
+const ObjectID = require("mongodb").ObjectID;
+
 const fs = require("fs");
 
 // @route GET api/posts
@@ -15,11 +18,32 @@ const fs = require("fs");
 // @access Public
 router.get("/", async (req, res) => {
   try {
-    /*const posts = await Post.find({})
-      .sort({ createdAt: -1 })
-      .populate("user", ["name", "username", "avatar"]);*/
     const posts = await Post.aggregate([
       { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: "list_students",
+          localField: "_id",
+          foreignField: "post",
+          as: "liststudent",
+        },
+      },
+      {
+        $addFields: {
+          sumprice: { $sum: "$liststudent.price" },
+        },
+      },
+      { $unset: "liststudent" },
+      {
+        $lookup: {
+          from: "categorys",
+          localField: "coursetype",
+          foreignField: "_id",
+          as: "categorytemp",
+        },
+      },
+      { $addFields: { category: { $arrayElemAt: ["$categorytemp", 0] } } },
+      { $unset: "categorytemp" },
       {
         $lookup: {
           from: "users",
@@ -74,6 +98,8 @@ router.get("/", async (req, res) => {
           "user.createdAt": false,
           "user.__v": false,
           "user.type": false,
+          "category.__v": false,
+          "category._id": false,
         },
       },
     ]);
@@ -89,15 +115,22 @@ router.get("/", async (req, res) => {
 // @access Private
 router.get("/myposts/:id", verifyToken, async (req, res) => {
   try {
-    /*const posts = await Post.find({ user: req.params.id })
-      .sort({ createdAt: -1 })
-      .populate("user", ["name", "username", "avatar"]);*/
     var id = mongoose.Types.ObjectId(req.params.id);
     const posts = await Post.aggregate([
       {
         $match: { user: id },
       },
       { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: "categorys",
+          localField: "coursetype",
+          foreignField: "_id",
+          as: "categorytemp",
+        },
+      },
+      { $addFields: { category: { $arrayElemAt: ["$categorytemp", 0] } } },
+      { $unset: "categorytemp" },
       {
         $lookup: {
           from: "users",
@@ -152,6 +185,8 @@ router.get("/myposts/:id", verifyToken, async (req, res) => {
           "user.createdAt": false,
           "user.__v": false,
           "user.type": false,
+          "category.__v": false,
+          "category._id": false,
         },
       },
     ]);
@@ -167,10 +202,6 @@ router.get("/myposts/:id", verifyToken, async (req, res) => {
 // @access Private
 router.get("/myenrolls/:id", verifyToken, async (req, res) => {
   try {
-    /*const posts = await Student.find({ user: req.params.id })
-      .populate("post")
-      .populate("user", ["name", "username", "avatar"])
-      .sort({ createdAt: -1 });*/
     var id = mongoose.Types.ObjectId(req.params.id);
     const posts = await Student.aggregate([
       {
@@ -187,6 +218,16 @@ router.get("/myenrolls/:id", verifyToken, async (req, res) => {
       },
       { $addFields: { post: { $arrayElemAt: ["$listpost", 0] } } },
       { $unset: "listpost" },
+      {
+        $lookup: {
+          from: "categorys",
+          localField: "post.coursetype",
+          foreignField: "_id",
+          as: "categorytemp",
+        },
+      },
+      { $addFields: { category: { $arrayElemAt: ["$categorytemp", 0] } } },
+      { $unset: "categorytemp" },
       {
         $lookup: {
           from: "users",
@@ -254,6 +295,8 @@ router.get("/myenrolls/:id", verifyToken, async (req, res) => {
           "user.createdAt": false,
           "user.__v": false,
           "user.type": false,
+          "category.__v": false,
+          "category._id": false,
         },
       },
     ]);
@@ -269,20 +312,21 @@ router.get("/myenrolls/:id", verifyToken, async (req, res) => {
 // @access Public
 router.get("/:id", async (req, res) => {
   try {
-    /* const post = await Post.findById(req.params.id).populate("user", [
-      "name",
-      "username",
-      "avatar",
-    ]);*/
-    /*const more = await Post.find({})
-      .sort({ createdAt: -1 })
-      .limit(4)
-      .populate("user", ["name", "username", "avatar"]);*/
     var id = mongoose.Types.ObjectId(req.params.id);
     const posts = await Post.aggregate([
       {
         $match: { _id: id },
       },
+      {
+        $lookup: {
+          from: "categorys",
+          localField: "coursetype",
+          foreignField: "_id",
+          as: "categorytemp",
+        },
+      },
+      { $addFields: { category: { $arrayElemAt: ["$categorytemp", 0] } } },
+      { $unset: "categorytemp" },
       {
         $lookup: {
           from: "users",
@@ -337,6 +381,8 @@ router.get("/:id", async (req, res) => {
           "user.createdAt": false,
           "user.__v": false,
           "user.type": false,
+          "category.__v": false,
+          "category._id": false,
         },
       },
     ]);
@@ -345,6 +391,16 @@ router.get("/:id", async (req, res) => {
       { $limit: 4 },
       {
         $lookup: {
+          from: "categorys",
+          localField: "coursetype",
+          foreignField: "_id",
+          as: "categorytemp",
+        },
+      },
+      { $addFields: { category: { $arrayElemAt: ["$categorytemp", 0] } } },
+      { $unset: "categorytemp" },
+      {
+        $lookup: {
           from: "users",
           localField: "user",
           foreignField: "_id",
@@ -397,6 +453,8 @@ router.get("/:id", async (req, res) => {
           "user.createdAt": false,
           "user.__v": false,
           "user.type": false,
+          "category.__v": false,
+          "category._id": false,
         },
       },
     ]);
@@ -410,11 +468,16 @@ router.get("/:id", async (req, res) => {
 
 // @route GET api/posts/hot/
 // @desc Get post hot
-// @access Public
-router.get("/hot/:id", async (req, res) => {
+// @access Private
+router.get("/hot/:id", verifyToken, async (req, res) => {
   try {
     const posts_hot = await Student.aggregate([
       { $group: { _id: "$post", students: { $sum: 1 } } },
+      {
+        $addFields: {
+          sumprice: { $sum: "$price" },
+        },
+      },
       {
         $lookup: {
           from: "posts",
@@ -424,7 +487,19 @@ router.get("/hot/:id", async (req, res) => {
         },
       },
       { $addFields: { name: { $arrayElemAt: ["$info.title", 0] } } },
+      { $addFields: { idauthor: { $arrayElemAt: ["$info.user", 0] } } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "idauthor",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      { $addFields: { authorname: { $arrayElemAt: ["$author.name", 0] } } },
       { $unset: "info" },
+      { $unset: "idauthor" },
+      { $unset: "author" },
       {
         $lookup: {
           from: "post_details",
@@ -485,8 +560,7 @@ router.get("/hot/:id", async (req, res) => {
 // @desc Create post
 // @access Private
 router.post("/", verifyToken, async (req, res) => {
-  const { title, description, coursetype, thumbnail } = req.body;
-
+  const { title, description, coursetype, thumbnail, price } = req.body;
   // Validation cơ bản
   if (!title)
     return res
@@ -495,9 +569,19 @@ router.post("/", verifyToken, async (req, res) => {
 
   // Validation cơ bản
   if (!thumbnail)
+    return res.status(400).json({ success: false, message: "Ảnh là bắt buộc" });
+
+  // Validation cơ bản
+  if (!ObjectID.isValid(coursetype))
     return res
       .status(400)
-      .json({ success: false, message: "Ảnh tiêu đề là bắt buộc" });
+      .json({ success: false, message: "Thể loại là bắt buộc" });
+
+  // Validation cơ bản
+  if (parseInt(price) < 0)
+    return res
+      .status(400)
+      .json({ success: false, message: "Giá là bắt buộc và phải dương" });
 
   try {
     const newPost = new Post({
@@ -506,6 +590,7 @@ router.post("/", verifyToken, async (req, res) => {
       user: req.userId,
       coursetype,
       thumbnail: thumbnail,
+      price,
     });
 
     await newPost
@@ -529,7 +614,7 @@ router.post("/", verifyToken, async (req, res) => {
 // @desc Update post
 // @access Private
 router.put("/:id", verifyToken, async (req, res) => {
-  const { title, description, coursetype, thumbnail } = req.body;
+  const { title, description, coursetype, thumbnail, price } = req.body;
 
   // Validation cơ bản
   if (!title)
@@ -537,12 +622,23 @@ router.put("/:id", verifyToken, async (req, res) => {
       .status(400)
       .json({ success: false, message: "Tiêu đề là bắt buộc" });
 
+  // Validation cơ bản
+  if (!ObjectID.isValid(coursetype))
+    return res
+      .status(400)
+      .json({ success: false, message: "Thể loại là bắt buộc" });
+
+  // Validation cơ bản
+  if (parseInt(price) < 0)
+    return res.status(400).json({ success: false, message: "Giá là bắt buộc" });
+
   try {
     let updatedPost = {
       title,
       description: description || "",
       coursetype,
       thumbnail: thumbnail,
+      price,
     };
 
     var postUpdateCondition;
@@ -620,6 +716,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
 
     if (OneStudent) {
       // Bổ xung xóa student liên quan
+      var studentDeleteCondition;
       if (permission.type == "admin")
         studentDeleteCondition = { post: req.params.id };
       else studentDeleteCondition = { post: req.params.id, user: req.userId };
@@ -637,6 +734,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
 
     if (OneComment) {
       // Bổ xung xóa Comment liên quan
+      var studentDeleteCondition;
       if (permission.type == "admin")
         CommentDeleteCondition = { post: req.params.id };
       else CommentDeleteCondition = { post: req.params.id, user: req.userId };
@@ -646,6 +744,25 @@ router.delete("/:id", verifyToken, async (req, res) => {
           success: false,
           message:
             "Không tìm thấy học viên liên quan hoặc người dùng không được ủy quyền",
+        });
+    }
+
+    // Kiểm tra Question đã tồn tại hay chưa
+    const OneQuestion = await Question.findOne({ post: req.params.id });
+
+    if (OneQuestion) {
+      // Bổ xung xóa Question liên quan
+      var questionDeleteCondition;
+      if (permission.type == "admin")
+        questionDeleteCondition = { post: req.params.id };
+      const deletedquestion = await Question.deleteMany(
+        questionDeleteCondition
+      );
+      if (!deletedquestion)
+        return res.status(401).json({
+          success: false,
+          message:
+            "Không tìm thấy câu hỏi liên quan hoặc người dùng không được ủy quyền",
         });
     }
 

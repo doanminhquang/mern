@@ -61,6 +61,7 @@ var arr = [
     showtext: "Hoàn thành",
   },
 ];
+
 const getValue = (showtext) => {
   var res = arr.find((o) => o.showtext === showtext);
   return res.value;

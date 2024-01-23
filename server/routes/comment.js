@@ -72,8 +72,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// @route POST api/students
-// @desc Create student
+// @route POST api/comments
+// @desc Create comments
 // @access Private
 router.post("/", verifyToken, async (req, res) => {
   const { post, cmt, rating } = req.body;

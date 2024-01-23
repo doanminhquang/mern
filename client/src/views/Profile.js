@@ -17,6 +17,7 @@ import { convertBase64 } from "../utils/convertBase64";
 import { BiImageAdd } from "react-icons/bi";
 import { isImage } from "../utils/CheckExtension";
 import Toast from "react-bootstrap/Toast";
+import ChatPopup from "../components/chat/ChatPopupComponent";
 
 export default function Profile() {
   const {
@@ -509,6 +510,8 @@ export default function Profile() {
           </Toast.Body>
         </Toast>
       </section>
+
+      <ChatPopup />
       <Footer />
     </>
   );

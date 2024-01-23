@@ -9,6 +9,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { PostContext } from "../contexts/PostContext";
 import { CategoryContext } from "../contexts/CategoryContext";
 //--------------------------------------------------------
+import ChatPopup from "../components/chat/ChatPopupComponent";
 
 const Courses = () => {
   // Contexts
@@ -185,6 +186,8 @@ const Courses = () => {
           </div>
         </div>
       </section>
+
+      <ChatPopup />
       <Footer />
     </>
   );

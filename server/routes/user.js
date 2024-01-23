@@ -49,7 +49,7 @@ router.post("/", verifyToken, async (req, res) => {
   if (!username || !password || !email || !name || !phone)
     return res.status(400).json({
       success: false,
-      message: "Vui lòng kiểm tra các trường thtôngg tin",
+      message: "Vui lòng kiểm tra các trường thông tin",
     });
 
   try {
@@ -159,9 +159,36 @@ router.put("/:id", verifyToken, async (req, res) => {
 // @desc Update user
 // @access Private
 router.put("/myinfo/:id", verifyToken, async (req, res) => {
-  const { nusername, nemail, npassword, nname, navatar, ntype, nphone } =
-    req.body;
+  const {
+    spassword,
+    nusername,
+    nemail,
+    npassword,
+    nname,
+    navatar,
+    ntype,
+    nphone,
+    flag,
+  } = req.body;
   let stockpass = await User.findById(req.userId).select("password");
+
+  if (!spassword)
+    return res.status(400).json({
+      success: false,
+      message: "Mật khẩu gốc không được phép thiếu",
+    });
+
+  const passwordValid = await argon2.verify(stockpass.password, spassword);
+  if (!passwordValid)
+    return res.status(400).json({
+      success: false,
+      message: "Mật khẩu không chính xác",
+    });
+  else if (flag)
+    return res.json({
+      success: true,
+      message: "Mật khẩu chính xác",
+    });
 
   let hashedPassword = "";
   if (npassword !== "") {

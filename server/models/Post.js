@@ -15,18 +15,17 @@ const PostSchema = new Schema({
     required: true,
   },
   coursetype: {
-    type: String,
-    enum: [
-      "Data Science",
-      "Computer Science",
-      "Web Development",
-      "Mobile Development",
-      "Application Development",
-      "Other",
-    ],
+    type: Schema.Types.ObjectId,
+    ref: "categorys",
+    required: true,
   },
   thumbnail: {
     type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
   },
   createdAt: {
     type: Date,

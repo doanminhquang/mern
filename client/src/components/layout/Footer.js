@@ -16,7 +16,7 @@ export default function Footer() {
                 >
                   Đoàn Minh Quang{" "}
                 </a>
-                © 2021
+                © 2024
               </p>
             </div>
           </div>

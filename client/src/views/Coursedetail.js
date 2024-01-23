@@ -53,6 +53,8 @@ import Form from "react-bootstrap/Form";
 import axios from "axios";
 //-------------------------------------------------------------
 import { useLocation } from "react-router";
+import { getCurrencyVnd } from "../utils/GettextDisplay";
+import ChatPopup from "../components/chat/ChatPopupComponent";
 
 const Coursedetail = (props) => {
   // State
@@ -70,7 +72,10 @@ const Coursedetail = (props) => {
   const location = useLocation();
 
   var url = window.location.href;
-  var id = url.substring(url.lastIndexOf("?id=") + 4);
+  //var id = url.substring(url.lastIndexOf("?id=") + 4);
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  const id = urlParams.get("id");
 
   // State modal
   const [newContact, setNewContact] = useState({
@@ -1390,8 +1395,7 @@ const Coursedetail = (props) => {
                   </li>
                   <li>
                     <MdOutlinePriceChange />
-                    <span>Giá: </span>{" "}
-                    {post.price !== 0 ? <>{post.price} VNĐ</> : <>Miễn Phí</>}
+                    <span>Giá: </span> {getCurrencyVnd(post.price)}
                   </li>
                 </ul>
                 {videos.length === 0 ? (
@@ -1670,6 +1674,8 @@ const Coursedetail = (props) => {
           )}
         </div>
       </section>
+
+      <ChatPopup />
       <Footer />
       {video !== null && showVideoModal && <ShowVideoModal />}
       {/* After contact is added, show toast */}

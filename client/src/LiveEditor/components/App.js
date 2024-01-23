@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Editor from "./Editor";
 import useLocalStorage from "../hooks/useLocalStorage";
+import ChatPopup from "../../components/chat/ChatPopupComponent";
 
 function App() {
   const [html, setHtml] = useLocalStorage("html", "");
@@ -88,6 +89,8 @@ function App() {
           />
         </div>
       </div>
+
+      <ChatPopup />
     </>
   );
 }

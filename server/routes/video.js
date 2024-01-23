@@ -146,7 +146,7 @@ router.put("/:id", verifyToken, async (req, res) => {
     res.json({
       success: true,
       message: "Đã cập nhật!",
-      contact: updatedVideo,
+      video: updatedVideo,
     });
   } catch (error) {
     console.log(error);

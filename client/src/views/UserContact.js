@@ -14,6 +14,7 @@ import { ContactContext } from "../contexts/ContactContext";
 import Toast from "react-bootstrap/Toast";
 //---------------------------------------------------------
 import Banner from "../assets/banner.jpg";
+import ChatPopup from "../components/chat/ChatPopupComponent";
 
 const UserContact = () => {
   // Contexts
@@ -228,6 +229,7 @@ const UserContact = () => {
         </section>
       </div>
 
+      <ChatPopup />
       <Footer />
       {/* After contact is added, show toast */}
       <Toast
